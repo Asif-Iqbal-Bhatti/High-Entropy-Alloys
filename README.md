@@ -1,4 +1,4 @@
-# Generalized-stancking-fault-energy
+# Generalized-stacking-fault-energy
 
 |||--> b means burger vector
 
@@ -8,8 +8,10 @@
 
 |||--> For gamma surface vary b form 0b to 1b
 
-NB:: You will need to install atomsk. The link is:
-https://github.com/pierrehirel/atomsk/
+NB:: For executation you will need to install atomsk. The link is:
+https://github.com/pierrehirel/atomsk/ 
+it generates POSCAR files and these can be run independently with VASP and after relaxation in the z direction
+the energy can be calulated and GSFE can be calculated and plotted against normalized burger vector.
 
 ```
 Some bcc materials (e.g. α-Fe) can contain up to 48 slip systems. 
