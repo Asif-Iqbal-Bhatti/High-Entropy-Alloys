@@ -8,6 +8,9 @@
 
 |||--> For gamma surface vary b form 0b to 1b
 
+NB:: You will need to install atomsk. The link is:
+https://github.com/pierrehirel/atomsk/
+
 ```
 Some bcc materials (e.g. α-Fe) can contain up to 48 slip systems. 
 There are six slip planes of type {110}, each with two <111> directions (12 systems). 
