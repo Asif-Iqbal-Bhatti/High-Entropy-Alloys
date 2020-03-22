@@ -13,6 +13,8 @@ https://github.com/pierrehirel/atomsk/
 it generates POSCAR files and these can be run independently with VASP and after relaxation in the z direction
 the energy can be calulated and GSFE can be calculated and plotted against normalized burger vector.
 
+GSFE = (E_fault - E_perfect)/Area
+
 ```
 Some bcc materials (e.g. α-Fe) can contain up to 48 slip systems. 
 There are six slip planes of type {110}, each with two <111> directions (12 systems). 
