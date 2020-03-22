@@ -1,4 +1,4 @@
-# Generalized-stacking-fault-energy
+# Generate Stacking fault energy for bcc crystal along (110)<111>
 
 |||--> b means burger vector
 
