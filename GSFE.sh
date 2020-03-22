@@ -15,6 +15,13 @@
 count=00;
 ax=9.3860; 	# Lattice parameter change according to your situation
 
+if [ "$1" == "POSCAR.cif" ]; then
+  echo "-vasp"
+else
+	echo "Enter POSCAR to .cif file. Convert with VESTA software"
+  exit	
+fi 
+	
 b=$(echo "scale=6; $ax*sqrt(3.0)/2" | bc -l); 
 echo "burger vectors b:: " $b "and lattice vector:: " $ax
 
@@ -26,7 +33,7 @@ echo "i=$i::$count::"    $j
 #touch b_$j
 #echo $j > b_$j
 
-atomsk POSCAR.cif -shift above 0.2*box Z 0 $j 0 -wrap -fix X -fix Y POSCAR
+atomsk $1 -shift above 0.25*box Z 0 $j 0 -wrap -fix X -fix Y POSCAR
 mv POSCAR POSCAR_$count
 
 #count=$(echo "$count+1" | bc -l);
