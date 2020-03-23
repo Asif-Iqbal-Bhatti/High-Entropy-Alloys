@@ -11,28 +11,29 @@
 # activation energy to {110}, they are so close in energy that for all intents and 
 # purposes they can be treated as identical. example: 
 # slip plane and direction are (110) and [-111], respectively
+# https://www.sciencedirect.com/science/article/pii/S1359645417303671
+# https://journals-aps-org.gaelnomade-2.grenet.fr/prb/pdf/10.1103/PhysRevB.62.3099
 #------------------------------------------------------------------------------------------
 count=00;
-ax=9.3860; 	# Lattice parameter change according to your situation
-
-if [ "$1" == "POSCAR.cif" ]; then
+ax=9.18033; 	# Lattice parameter change according to your situation
+touch burger.dat
+if [ "$1" == "POSCAR110.cif" ]; then
   echo "-vasp"
 else
-	echo "Enter POSCAR to .cif file. Convert with VESTA software"
+	echo "COnvert POSCAR to .cif file. Convert with VESTA software"
   exit	
 fi 
 	
-b=$(echo "scale=6; $ax*sqrt(3.0)/2" | bc -l); 
-echo "burger vectors b:: " $b "and lattice vector:: " $ax
+b=$(echo "scale=6; $ax*(sqrt(3.0)/2)" | bc -l); # Definition of a burger vector
+echo "burger vectors b:: " $b "and lattice vector l:: " $ax
 
 # change this value for # of displacement for burger vector
-for i in `seq -w 0.0 0.1 1.0`
+for i in `seq -w 0.0 0.05 1.0`
 do
 j=$(echo "$b*$i" | bc -l);
-echo "i=$i::$count::"    $j  
-#touch b_$j
-#echo $j > b_$j
 
+echo "i=$i::#=$count::"    $j  
+echo $j >> burger.dat
 atomsk $1 -shift above 0.25*box Z 0 $j 0 -wrap -fix X -fix Y POSCAR
 mv POSCAR POSCAR_$count
 
