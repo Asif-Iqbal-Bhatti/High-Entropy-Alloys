@@ -13,7 +13,7 @@ real(kind=8)           :: pivalue, pisurtrois, factor, pioversix
 real(kind=8)           :: radius, XDislo, YDislo, xx, yy, zz
 real(kind=8)           :: ux, uy, theta1, theta2, distance
 real(kind=8),dimension(3)                 :: C1, C2
-real(kind=8),dimension(3)                 :: unit_lat, UnitCellDim
+real(kind=8),dimension(3)                 :: unit_lat, supercell
 real(kind=8),dimension(3,2)               :: dimbox
 real(kind=8),dimension(3,3)               :: dimbox_pos
 real(kind=8),dimension(:,:), allocatable  :: Cart_cord
@@ -48,17 +48,17 @@ Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Ca
 
 !------------------------- Size of the unit cell !-------------------------
 !!!              Change supercell vector according to your need         !!!
-UnitCellDim(1)=unit_lat(1) 
-UnitCellDim(2)=unit_lat(2)
-UnitCellDim(3)=unit_lat(3)
+supercell(1)=unit_lat(1) 
+supercell(2)=unit_lat(2)
+supercell(3)=unit_lat(3)
 N(1)=4
 N(2)=6  ! odd
 N(3)=1
 write(*,*)'X=[112]',unit_lat(1),'Y=[110]', unit_lat(2)
 write(*,*)'Supercell scaling (X,Y,Z)', N(1), N(2), N(3)
-write(*,*)'Scaling unit cells along X,', UnitCellDim(1)*N(1)
-write(*,*)'Scaling unit cells along Y,', UnitCellDim(2)*N(2)
-write(*,*)'Scaling unit cells along Z,', UnitCellDim(3)*N(3)
+write(*,*)'Scaling unit cells along X,', supercell(1)*N(1)
+write(*,*)'Scaling unit cells along Y,', supercell(2)*N(2)
+write(*,*)'Scaling unit cells along Z,', supercell(3)*N(3)
 ncelltot = N(1)*N(2)*N(3)
 
 allocate(Tot_atom(ncelltot,atom_cell,3))
@@ -70,9 +70,9 @@ do i=1,N(1)
   do k=1,N(3)
    image_cell = image_cell + 1
    do l=1,atom_cell
-     Tot_atom(image_cell,l,1) = Cart_cord(l,1) + (i-1)*UnitCellDim(1)
-     Tot_atom(image_cell,l,2) = Cart_cord(l,2) + (j-1)*UnitCellDim(2)
-     Tot_atom(image_cell,l,3) = Cart_cord(l,3) + (k-1)*UnitCellDim(3)
+     Tot_atom(image_cell,l,1) = Cart_cord(l,1) + (i-1)*supercell(1)
+     Tot_atom(image_cell,l,2) = Cart_cord(l,2) + (j-1)*supercell(2)
+     Tot_atom(image_cell,l,3) = Cart_cord(l,3) + (k-1)*supercell(3)
    enddo
   enddo
  enddo
@@ -84,18 +84,18 @@ write(*,'(a)') 'Generating Screw Dislocations >>>'
 
 !#***************Position of dislocation line at C1(X, Y, Z) for +b*********
 C1(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C1(1) = 0.30d0*N(1)*UnitCellDim(1) - delta !** X1
-C1(2) = 0.26d0*N(2)*UnitCellDim(2) 				!** Y1
-C1(3) = N(3)*UnitCellDim(3) 						!** Z1
+C1(1) = 0.30d0*N(1)*supercell(1) - delta !** X1
+C1(2) = 0.26d0*N(2)*supercell(2) 				!** Y1
+C1(3) = N(3)*supercell(3) 						!** Z1
 
 write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
 write(*,*) C1(1),C1(2),C1(3)
 
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C2(1) = 0.59d0*N(1)*UnitCellDim(1) - delta !** X2
-C2(2) = 0.72d0*N(2)*UnitCellDim(2) 				!** Y2
-C2(3) = N(3)*UnitCellDim(3) 				!** Z2
+C2(1) = 0.59d0*N(1)*supercell(1) - delta !** X2
+C2(2) = 0.72d0*N(2)*supercell(2) 				!** Y2
+C2(3) = N(3)*supercell(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
 write(*,*) C2(1),C2(2),C2(3)
@@ -110,7 +110,7 @@ write(*,*) '*** Distance between Dipoles >>> ', distance
 !metry center of the array: fixing, as a convention, the origin at a dislocation center,
 !if a dislocation b is located at the position r, there will also be a dislocation b in −r.
 
-d = 0.50d0*(N(1)*UnitCellDim(1) + N(2)*UnitCellDim(2))
+d = 0.50d0*(N(1)*supercell(1) + N(2)*supercell(2))
 write(*,*) 'Vector d linking the two dislocations of opposite signs is >>> ', d
 p = sqrt( d**2 - (C2(1)-C1(1))**2 )
 
@@ -125,16 +125,16 @@ do i=1,N(1)
    image_cell = image_cell + 1
    do l=1,6
 	 
-    !* tan**(-1)(x/y)
+    !--- (b/2pi)*tan**(-1)(y/x)
     xx = Tot_atom(image_cell,l,1)
     yy = Tot_atom(image_cell,l,2)
 		
     theta1 = datan2((xx-C1(1)),(yy-C1(2) ) )
     theta2 = datan2((xx-C2(1)),(yy-C2(2) ) )
 		
-    !*** screw dislocation displacement in Z direction
-    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + burgers/2.0d0/pivalue*(theta1)
-    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - burgers/2.0d0/pivalue*(theta2)
+    !--- Screw dislocation displacement in Z direction
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta1)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta2)
 
    enddo
   enddo
@@ -144,9 +144,9 @@ enddo
 !-----------------------------------------------------------------------------------
 !#****************************** Writing to a file ************************
 dimbox(:,:)=0.0d0; dimbox_pos(:,:)=0.0d0
-dimbox(1,2) = N(1)*UnitCellDim(1); dimbox_pos(1,1) = N(1)*UnitCellDim(1)
-dimbox(2,2) = N(2)*UnitCellDim(2); dimbox_pos(2,2) = N(2)*UnitCellDim(2)
-dimbox(3,2) = N(3)*UnitCellDim(3); dimbox_pos(3,3) = N(3)*UnitCellDim(3)
+dimbox(1,2) = N(1)*supercell(1); dimbox_pos(1,1) = N(1)*supercell(1)
+dimbox(2,2) = N(2)*supercell(2); dimbox_pos(2,2) = N(2)*supercell(2)
+dimbox(3,2) = N(3)*supercell(3); dimbox_pos(3,3) = N(3)*supercell(3)
 
 !#*************************************************************************
 open(1,file='Ta_lammps.lmp',status='REPLACE')
