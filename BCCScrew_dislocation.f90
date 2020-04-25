@@ -5,9 +5,9 @@ program BCC_Dislocation
 implicit none
 !------------------------- 
 integer                :: atom_cell, ncelltot, numatomstot, latt_par
-integer                :: i, j, k, l, NumCellP, iun, m, numhide
+integer                :: i, j, k, l, image_cell, iun, m, numhide
 integer,dimension(4)   :: N
-real(kind=8)           :: R_2, R_3, R_6, delta, d
+real(kind=8)           :: R_2, R_3, R_6, delta, d, P
 real(kind=8)           :: burgers, bcc_lat
 real(kind=8)           :: pivalue, pisurtrois, factor, pioversix
 real(kind=8)           :: radius, XDislo, YDislo, xx, yy, zz
@@ -47,12 +47,12 @@ Cart_cord(5,1)=unit_lat(1)*(1.0d0/6.0d0); Cart_cord(5,2)=unit_lat(2)*(0.5d0); Ca
 Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Cart_cord(6,3)=unit_lat(3)*(1.0d0/3.0d0)
 
 !------------------------- Size of the unit cell !-------------------------
-
+!!!              Change supercell vector according to your need         !!!
 UnitCellDim(1)=unit_lat(1) 
 UnitCellDim(2)=unit_lat(2)
 UnitCellDim(3)=unit_lat(3)
-N(1)=5 
-N(2)=8 
+N(1)=4
+N(2)=6  ! odd
 N(3)=1
 write(*,*)'X=[112]',unit_lat(1),'Y=[110]', unit_lat(2)
 write(*,*)'Supercell scaling (X,Y,Z)', N(1), N(2), N(3)
@@ -64,75 +64,77 @@ ncelltot = N(1)*N(2)*N(3)
 allocate(Tot_atom(ncelltot,atom_cell,3))
 
 !------------------------- Generate the atomic positions for a supercell
-NumCellP = 0
+image_cell = 0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
-   NumCellP = NumCellP + 1
+   image_cell = image_cell + 1
    do l=1,atom_cell
-     Tot_atom(NumCellP,l,1) = Cart_cord(l,1) + (i-1)*UnitCellDim(1)
-     Tot_atom(NumCellP,l,2) = Cart_cord(l,2) + (j-1)*UnitCellDim(2)
-     Tot_atom(NumCellP,l,3) = Cart_cord(l,3) + (k-1)*UnitCellDim(3)
+     Tot_atom(image_cell,l,1) = Cart_cord(l,1) + (i-1)*UnitCellDim(1)
+     Tot_atom(image_cell,l,2) = Cart_cord(l,2) + (j-1)*UnitCellDim(2)
+     Tot_atom(image_cell,l,3) = Cart_cord(l,3) + (k-1)*UnitCellDim(3)
    enddo
   enddo
  enddo
 enddo
-
-!#***************Position of dislocation line at C1(X, Y, Z) for +b*********
+write(*,*) "Total Number of atoms in the cell is", image_cell*6
 
 write(*,'(a)') ''   
-write(*,'(a)') 'Generating Screw Dislocations >>>'   
+write(*,'(a)') 'Generating Screw Dislocations >>>' 
 
+!#***************Position of dislocation line at C1(X, Y, Z) for +b*********
 C1(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C1(1) = 0.30d0*N(1)*UnitCellDim(1) - delta !** X
-C1(2) = 0.26d0*N(2)*UnitCellDim(2) 					!** Y
-C1(3) = N(3)*UnitCellDim(3) 								!** Z
+C1(1) = 0.30d0*N(1)*UnitCellDim(1) - delta !** X1
+C1(2) = 0.26d0*N(2)*UnitCellDim(2) 				!** Y1
+C1(3) = N(3)*UnitCellDim(3) 						!** Z1
 
 write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
 write(*,*) C1(1),C1(2),C1(3)
 
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C2(1) = 0.59d0*N(1)*UnitCellDim(1) - delta !** X
-C2(2) = 0.72d0*N(2)*UnitCellDim(2) 					!** Y
-C2(3) = N(3)*UnitCellDim(3) 								!** Z
+C2(1) = 0.59d0*N(1)*UnitCellDim(1) - delta !** X2
+C2(2) = 0.72d0*N(2)*UnitCellDim(2) 				!** Y2
+C2(3) = N(3)*UnitCellDim(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
 write(*,*) C2(1),C2(2),C2(3)
 
 !#*************************************************************************
-!A periodic array is quadrupolar, if the vector d linking the two disloca-
+distance = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
+write(*,*) '*** Distance between Dipoles >>> ', distance
+
+!A periodic array is quadrupole, if the vector d linking the two disloca-
 !tions of opposite signs is equal to 1/2 (u1 +u2), where u1 and u2 are the periodicity
 !vectors of the simulation cell. This ensures that every dislocation is a sym-
 !metry center of the array: fixing, as a convention, the origin at a dislocation center,
 !if a dislocation b is located at the position r, there will also be a dislocation b in −r.
 
-d = 0.50d0*(UnitCellDim(1) + UnitCellDim(2))
+d = 0.50d0*(N(1)*UnitCellDim(1) + N(2)*UnitCellDim(2))
 write(*,*) 'Vector d linking the two dislocations of opposite signs is >>> ', d
-distance = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
-write(*,*) 'Distance between Dipoles >>> ', distance
+p = sqrt( d**2 - (C2(1)-C1(1))**2 )
 
 ! -------------------------------------------------------------------------
-burgers = bcc_lat*R_3/2.0 ! b=a/2<111>
+burgers = bcc_lat*R_3/2.0 ! b=a<111>/2
 
-NumCellP = 0
+image_cell = 0
 numhide=0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
-   NumCellP = NumCellP + 1
+   image_cell = image_cell + 1
    do l=1,6
 	 
     !* tan**(-1)(x/y)
-    xx = Tot_atom(NumCellP,l,1)
-    yy = Tot_atom(NumCellP,l,2)
+    xx = Tot_atom(image_cell,l,1)
+    yy = Tot_atom(image_cell,l,2)
 		
     theta1 = datan2((xx-C1(1)),(yy-C1(2) ) )
     theta2 = datan2((xx-C2(1)),(yy-C2(2) ) )
 		
     !*** screw dislocation displacement in Z direction
-    Tot_atom(NumCellP,l,3) = Tot_atom(NumCellP,l,3) + burgers/2.0d0/pivalue*(theta1)
-    Tot_atom(NumCellP,l,3) = Tot_atom(NumCellP,l,3) - burgers/2.0d0/pivalue*(theta2)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + burgers/2.0d0/pivalue*(theta1)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - burgers/2.0d0/pivalue*(theta2)
 
    enddo
   enddo
@@ -160,13 +162,13 @@ write(1,*) 'Atoms'
 write(1,*)
 m=1
 iun=1
-NumCellP=0
+image_cell=0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
-   NumCellP = NumCellP+1
+   image_cell = image_cell+1
    do l=1,6
-    write(1,10) m, iun, Tot_atom(NumCellP,l,1:3)
+    write(1,10) m, iun, Tot_atom(image_cell,l,1:3)
     m  = m+1
    enddo
   enddo
@@ -184,13 +186,13 @@ write(2,'(a)') 'Ta'
 write(2,*) 6*ncelltot - numhide
 write(2,'(a)')'Cartesian'
 
-NumCellP=0
+image_cell=0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
-   NumCellP = NumCellP+1
+   image_cell = image_cell+1
    do l=1,6
-    write(2,20) Tot_atom(NumCellP,l,1:3)
+    write(2,20) Tot_atom(image_cell,l,1:3)
    enddo
   enddo
  enddo
