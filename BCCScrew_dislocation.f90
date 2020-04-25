@@ -4,21 +4,20 @@ program BCC_Dislocation
 
 implicit none
 !------------------------- 
-integer                :: atomspercel, ncelltot, numatomstot, latt_par
+integer                :: atom_cell, ncelltot, numatomstot, latt_par
 integer                :: i, j, k, l, NumCellP, iun, m, numhide
 integer,dimension(4)   :: N
-real(kind=8)           :: R_2, R_3, R_6, delta
+real(kind=8)           :: R_2, R_3, R_6, delta, d
 real(kind=8)           :: burgers, bcc_lat
 real(kind=8)           :: pivalue, pisurtrois, factor, pioversix
 real(kind=8)           :: radius, XDislo, YDislo, xx, yy, zz
 real(kind=8)           :: ux, uy, theta1, theta2, distance
 real(kind=8),dimension(3)                 :: C1, C2
-real(kind=8),dimension(3)                 :: unit_lat
-real(kind=8),dimension(3)                 :: UnitCellDim
+real(kind=8),dimension(3)                 :: unit_lat, UnitCellDim
 real(kind=8),dimension(3,2)               :: dimbox
 real(kind=8),dimension(3,3)               :: dimbox_pos
-real(kind=8),dimension(:,:), allocatable  :: cell_coord
-real(kind=8),dimension(:,:,:),allocatable :: AtomsTot
+real(kind=8),dimension(:,:), allocatable  :: Cart_cord
+real(kind=8),dimension(:,:,:),allocatable :: Tot_atom
 
 !------------------------- PARAMETERS for (111) unit cell
 R_3 = sqrt(3.0d0) ! [111]
@@ -33,19 +32,19 @@ bcc_lat = 3.31953d0
 !------------------------- 
 
 ! -- Definition of unit cell
-atomspercel = 6
-allocate(cell_coord(atomspercel,3))
-unit_lat(1) = bcc_lat*R_6       ! a*[112]=X
+atom_cell = 6
+allocate(Cart_cord(atom_cell,3))
+unit_lat(1) = bcc_lat*R_6       ! a*[1-1-2]=X
 unit_lat(2) = bcc_lat*R_2       ! a*[110]=Y
-unit_lat(3) = bcc_lat*R_3/2.0d0 ! a*[111]=Z --> a*<111>/2
+unit_lat(3) = bcc_lat*R_3/2.0d0 ! a*[1-11]=Z --> a*<111>/2
 
 ! -- Atomic positions within a unitcell (X,Y,Z)
-cell_coord(1,1)=unit_lat(1)*0.0d0        ; cell_coord(1,2)=unit_lat(2)*0.0d0  ; cell_coord(1,3)=unit_lat(3)*0.0d0;
-cell_coord(2,1)=unit_lat(1)*(1.0d0/2.0d0); cell_coord(2,2)=unit_lat(2)*(0.5d0); cell_coord(2,3)=unit_lat(3)*(0.0d0)
-cell_coord(3,1)=unit_lat(1)*(1.0d0/3.0d0); cell_coord(3,2)=unit_lat(2)*(0.0d0); cell_coord(3,3)=unit_lat(3)*(2.0d0/3.0d0)
-cell_coord(4,1)=unit_lat(1)*(5.0d0/6.0d0); cell_coord(4,2)=unit_lat(2)*(0.5d0); cell_coord(4,3)=unit_lat(3)*(2.0d0/3.0d0)
-cell_coord(5,1)=unit_lat(1)*(1.0d0/6.0d0); cell_coord(5,2)=unit_lat(2)*(0.5d0); cell_coord(5,3)=unit_lat(3)*(1.0d0/3.0d0)
-cell_coord(6,1)=unit_lat(1)*(2.0d0/3.0d0); cell_coord(6,2)=unit_lat(2)*(0.0d0); cell_coord(6,3)=unit_lat(3)*(1.0d0/3.0d0)
+Cart_cord(1,1)=unit_lat(1)*0.0d0        ; Cart_cord(1,2)=unit_lat(2)*0.0d0  ; Cart_cord(1,3)=unit_lat(3)*0.0d0;
+Cart_cord(2,1)=unit_lat(1)*(1.0d0/2.0d0); Cart_cord(2,2)=unit_lat(2)*(0.5d0); Cart_cord(2,3)=unit_lat(3)*(0.0d0)
+Cart_cord(3,1)=unit_lat(1)*(1.0d0/3.0d0); Cart_cord(3,2)=unit_lat(2)*(0.0d0); Cart_cord(3,3)=unit_lat(3)*(2.0d0/3.0d0)
+Cart_cord(4,1)=unit_lat(1)*(5.0d0/6.0d0); Cart_cord(4,2)=unit_lat(2)*(0.5d0); Cart_cord(4,3)=unit_lat(3)*(2.0d0/3.0d0)
+Cart_cord(5,1)=unit_lat(1)*(1.0d0/6.0d0); Cart_cord(5,2)=unit_lat(2)*(0.5d0); Cart_cord(5,3)=unit_lat(3)*(1.0d0/3.0d0)
+Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Cart_cord(6,3)=unit_lat(3)*(1.0d0/3.0d0)
 
 !------------------------- Size of the unit cell !-------------------------
 
@@ -62,7 +61,7 @@ write(*,*)'Scaling unit cells along Y,', UnitCellDim(2)*N(2)
 write(*,*)'Scaling unit cells along Z,', UnitCellDim(3)*N(3)
 ncelltot = N(1)*N(2)*N(3)
 
-allocate(AtomsTot(ncelltot,atomspercel,3))
+allocate(Tot_atom(ncelltot,atom_cell,3))
 
 !------------------------- Generate the atomic positions for a supercell
 NumCellP = 0
@@ -70,16 +69,17 @@ do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
    NumCellP = NumCellP + 1
-   do l=1,atomspercel
-     AtomsTot(NumCellP,l,1) = cell_coord(l,1) + (i-1)*UnitCellDim(1)
-     AtomsTot(NumCellP,l,2) = cell_coord(l,2) + (j-1)*UnitCellDim(2)
-     AtomsTot(NumCellP,l,3) = cell_coord(l,3) + (k-1)*UnitCellDim(3)
+   do l=1,atom_cell
+     Tot_atom(NumCellP,l,1) = Cart_cord(l,1) + (i-1)*UnitCellDim(1)
+     Tot_atom(NumCellP,l,2) = Cart_cord(l,2) + (j-1)*UnitCellDim(2)
+     Tot_atom(NumCellP,l,3) = Cart_cord(l,3) + (k-1)*UnitCellDim(3)
    enddo
   enddo
  enddo
 enddo
 
 !#***************Position of dislocation line at C1(X, Y, Z) for +b*********
+
 write(*,'(a)') ''   
 write(*,'(a)') 'Generating Screw Dislocations >>>'   
 
@@ -90,7 +90,7 @@ C1(3) = N(3)*UnitCellDim(3) 								!** Z
 
 write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
 write(*,*) C1(1),C1(2),C1(3)
-!#**************************************************************************
+
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
 C2(1) = 0.59d0*N(1)*UnitCellDim(1) - delta !** X
@@ -99,11 +99,20 @@ C2(3) = N(3)*UnitCellDim(3) 								!** Z
 
 write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
 write(*,*) C2(1),C2(2),C2(3)
-!#*************************************************************************
 
+!#*************************************************************************
+!A periodic array is quadrupolar, if the vector d linking the two disloca-
+!tions of opposite signs is equal to 1/2 (u1 +u2), where u1 and u2 are the periodicity
+!vectors of the simulation cell. This ensures that every dislocation is a sym-
+!metry center of the array: fixing, as a convention, the origin at a dislocation center,
+!if a dislocation b is located at the position r, there will also be a dislocation b in −r.
+
+d = 0.50d0*(UnitCellDim(1) + UnitCellDim(2))
+write(*,*) 'Vector d linking the two dislocations of opposite signs is >>> ', d
 distance = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
 write(*,*) 'Distance between Dipoles >>> ', distance
 
+! -------------------------------------------------------------------------
 burgers = bcc_lat*R_3/2.0 ! b=a/2<111>
 
 NumCellP = 0
@@ -115,21 +124,22 @@ do i=1,N(1)
    do l=1,6
 	 
     !* tan**(-1)(x/y)
-    xx = AtomsTot(NumCellP,l,1)
-    yy = AtomsTot(NumCellP,l,2)
+    xx = Tot_atom(NumCellP,l,1)
+    yy = Tot_atom(NumCellP,l,2)
 		
     theta1 = datan2((xx-C1(1)),(yy-C1(2) ) )
     theta2 = datan2((xx-C2(1)),(yy-C2(2) ) )
 		
     !*** screw dislocation displacement in Z direction
-    AtomsTot(NumCellP,l,3) = AtomsTot(NumCellP,l,3) + burgers/2.0d0/pivalue*(theta1)
-    AtomsTot(NumCellP,l,3) = AtomsTot(NumCellP,l,3) - burgers/2.0d0/pivalue*(theta2)
+    Tot_atom(NumCellP,l,3) = Tot_atom(NumCellP,l,3) + burgers/2.0d0/pivalue*(theta1)
+    Tot_atom(NumCellP,l,3) = Tot_atom(NumCellP,l,3) - burgers/2.0d0/pivalue*(theta2)
 
    enddo
   enddo
  enddo
-enddo   
-
+enddo  
+ 
+!-----------------------------------------------------------------------------------
 !#****************************** Writing to a file ************************
 dimbox(:,:)=0.0d0; dimbox_pos(:,:)=0.0d0
 dimbox(1,2) = N(1)*UnitCellDim(1); dimbox_pos(1,1) = N(1)*UnitCellDim(1)
@@ -156,7 +166,7 @@ do i=1,N(1)
   do k=1,N(3)
    NumCellP = NumCellP+1
    do l=1,6
-    write(1,10) m, iun, AtomsTot(NumCellP,l,1:3)
+    write(1,10) m, iun, Tot_atom(NumCellP,l,1:3)
     m  = m+1
    enddo
   enddo
@@ -180,16 +190,16 @@ do i=1,N(1)
   do k=1,N(3)
    NumCellP = NumCellP+1
    do l=1,6
-    write(2,20) AtomsTot(NumCellP,l,1:3)
+    write(2,20) Tot_atom(NumCellP,l,1:3)
    enddo
   enddo
  enddo
 enddo
 close(2)
 !#*************************************************************************
-
-deallocate(cell_coord)
-deallocate(AtomsTot)
+!-----------------------------------------------------------------------------------
+deallocate(Cart_cord)
+deallocate(Tot_atom)
 
 
 10 format(i8, i8, 3(1x, e12.5))
