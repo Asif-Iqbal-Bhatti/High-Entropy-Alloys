@@ -1,4 +1,4 @@
-# Generate Stacking fault energy for bcc crystal along (110)<111>
+# Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup
 
 |||--> b means burger vector
 
