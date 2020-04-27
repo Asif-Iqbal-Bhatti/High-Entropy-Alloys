@@ -11,8 +11,10 @@ real(kind=8)           :: R_2, R_3, R_6, delta, d, P
 real(kind=8)           :: burgers, bcc_lat
 real(kind=8)           :: pivalue, pisurtrois, factor, pioversix
 real(kind=8)           :: radius, XDislo, YDislo, xx, yy, zz
-real(kind=8)           :: ux, uy, theta1, theta2, distance
-real(kind=8),dimension(3)                 :: C1, C2
+real(kind=8)           :: ux, uy, theta1,theta2,theta3,theta4
+real(kind=8)           :: d1, d2, d3, d4
+real(kind=8),dimension(3)                 :: L0, L1, diag
+real(kind=8),dimension(3)                 :: C1, C2, C3, C4
 real(kind=8),dimension(3)                 :: unit_lat, supercell
 real(kind=8),dimension(3,2)               :: dimbox
 real(kind=8),dimension(3,3)               :: dimbox_pos
@@ -48,19 +50,21 @@ Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Ca
 
 !------------------------- Size of the unit cell !-------------------------
 !!!              Change supercell vector according to your need         !!!
-supercell(1)=unit_lat(1) 
-supercell(2)=unit_lat(2)
-supercell(3)=unit_lat(3)
-N(1)=4
-N(2)=6  ! odd
+N(1)=7
+N(2)=11  ! odd
 N(3)=1
+
+supercell(1)=N(1)*unit_lat(1) 
+supercell(2)=N(2)*unit_lat(2)
+supercell(3)=N(3)*unit_lat(3)
+
 write(*,*)'X=[112]',unit_lat(1),'Y=[110]', unit_lat(2)
 write(*,*)'Supercell scaling (X,Y,Z)', N(1), N(2), N(3)
-write(*,*)'Scaling unit cells along X,', supercell(1)*N(1)
-write(*,*)'Scaling unit cells along Y,', supercell(2)*N(2)
-write(*,*)'Scaling unit cells along Z,', supercell(3)*N(3)
-ncelltot = N(1)*N(2)*N(3)
+write(*,*)'Scaling unit cells along X,', supercell(1)
+write(*,*)'Scaling unit cells along Y,', supercell(2)
+write(*,*)'Scaling unit cells along Z,', supercell(3)
 
+ncelltot = N(1)*N(2)*N(3)
 allocate(Tot_atom(ncelltot,atom_cell,3))
 
 !------------------------- Generate the atomic positions for a supercell
@@ -70,9 +74,9 @@ do i=1,N(1)
   do k=1,N(3)
    image_cell = image_cell + 1
    do l=1,atom_cell
-     Tot_atom(image_cell,l,1) = Cart_cord(l,1) + (i-1)*supercell(1)
-     Tot_atom(image_cell,l,2) = Cart_cord(l,2) + (j-1)*supercell(2)
-     Tot_atom(image_cell,l,3) = Cart_cord(l,3) + (k-1)*supercell(3)
+     Tot_atom(image_cell,l,1) = Cart_cord(l,1) + (i-1)*unit_lat(1) ! Xi
+     Tot_atom(image_cell,l,2) = Cart_cord(l,2) + (j-1)*unit_lat(2) ! Yi
+     Tot_atom(image_cell,l,3) = Cart_cord(l,3) + (k-1)*unit_lat(3) ! Zi
    enddo
   enddo
  enddo
@@ -84,25 +88,47 @@ write(*,'(a)') 'Generating Screw Dislocations >>>'
 
 !#***************Position of dislocation line at C1(X, Y, Z) for +b*********
 C1(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C1(1) = 0.30d0*N(1)*supercell(1) - delta !** X1
-C1(2) = 0.26d0*N(2)*supercell(2) 				!** Y1
-C1(3) = N(3)*supercell(3) 						!** Z1
+C1(1) = 0.25d0*supercell(1) - delta !** X1
+C1(2) = 0.25d0*supercell(2) 				!** Y1
+C1(3) = supercell(3) 						!** Z1
 
 write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
 write(*,*) C1(1),C1(2),C1(3)
 
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C2(1) = 0.59d0*N(1)*supercell(1) - delta !** X2
-C2(2) = 0.72d0*N(2)*supercell(2) 				!** Y2
-C2(3) = N(3)*supercell(3) 				!** Z2
+C2(1) = 0.75d0*supercell(1) + delta !** X2
+C2(2) = 0.25d0*supercell(2) 				!** Y2
+C2(3) = supercell(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
 write(*,*) C2(1),C2(2),C2(3)
 
+!#***************Position of dislocation line at C3(X, Y, Z) for -b*********
+C3(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
+C3(1) = 0.75d0*supercell(1) - delta !** X2
+C3(2) = 0.75d0*supercell(2) 				!** Y2
+C3(3) = supercell(3) 				!** Z2
+
+write(*,'(a)') 'Position of dislocation line at C3(X, Y, Z) for +b >>>'
+write(*,*) C3(1),C3(2),C3(3)
+
+!#***************Position of dislocation line at C4(X, Y, Z) for -b*********
+C4(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
+C4(1) = 0.25d0*supercell(1) + delta !** X2
+C4(2) = 0.75d0*supercell(2) 				!** Y2
+C4(3) = supercell(3) 				!** Z2
+
+write(*,'(a)') 'Position of dislocation line at C4(X, Y, Z) for -b >>>'
+write(*,*) C4(1),C4(2),C4(3)
 !#*************************************************************************
-distance = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
-write(*,*) '*** Distance between Dipoles >>> ', distance
+
+d1 = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
+d2 = sqrt( (C1(1)-C3(1))**2 + (C1(2)-C3(2))**2 )
+d3 = sqrt( (C1(1)-C4(1))**2 + (C1(2)-C4(2))**2 )
+write(*,*) '*** Distance between Dipoles >>> ', d1
+write(*,*) '*** Distance between Dipoles >>> ', d2
+write(*,*) '*** Distance between Dipoles >>> ', d3
 
 !A periodic array is quadrupole, if the vector d linking the two disloca-
 !tions of opposite signs is equal to 1/2 (u1 +u2), where u1 and u2 are the periodicity
@@ -110,10 +136,17 @@ write(*,*) '*** Distance between Dipoles >>> ', distance
 !metry center of the array: fixing, as a convention, the origin at a dislocation center,
 !if a dislocation b is located at the position r, there will also be a dislocation b in −r.
 
-d = 0.50d0*(N(1)*supercell(1) + N(2)*supercell(2))
+d = 0.50d0*(supercell(1) + supercell(2))
 write(*,*) 'Vector d linking the two dislocations of opposite signs is >>> ', d
 p = sqrt( d**2 - (C2(1)-C1(1))**2 )
 
+L0=0.0; L1=0.0
+L0(1) = supercell(1)
+L1(2) = supercell(2)
+
+diag = 0.5*(dot_product(L0,L0)+dot_product(L0,L1))/(dot_product(L0,L0)+dot_product(L1,L1)+4*dot_product(L0,L1))
+write(*,*) diag
+	
 ! -------------------------------------------------------------------------
 burgers = bcc_lat*R_3/2.0 ! b=a<111>/2
 
@@ -131,10 +164,14 @@ do i=1,N(1)
 		
     theta1 = datan2((xx-C1(1)),(yy-C1(2) ) )
     theta2 = datan2((xx-C2(1)),(yy-C2(2) ) )
+    theta3 = datan2((xx-C3(1)),(yy-C3(2) ) )
+    theta4 = datan2((xx-C4(1)),(yy-C4(2) ) )
 		
     !--- Screw dislocation displacement in Z direction
     Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta1)
     Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta2)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta3)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta4)
 
    enddo
   enddo
@@ -144,9 +181,9 @@ enddo
 !-----------------------------------------------------------------------------------
 !#****************************** Writing to a file ************************
 dimbox(:,:)=0.0d0; dimbox_pos(:,:)=0.0d0
-dimbox(1,2) = N(1)*supercell(1); dimbox_pos(1,1) = N(1)*supercell(1)
-dimbox(2,2) = N(2)*supercell(2); dimbox_pos(2,2) = N(2)*supercell(2)
-dimbox(3,2) = N(3)*supercell(3); dimbox_pos(3,3) = N(3)*supercell(3)
+dimbox(1,2) = supercell(1); dimbox_pos(1,1) = supercell(1)
+dimbox(2,2) = supercell(2); dimbox_pos(2,2) = supercell(2)
+dimbox(3,2) = supercell(3); dimbox_pos(3,3) = supercell(3)
 
 !#*************************************************************************
 open(1,file='Ta_lammps.lmp',status='REPLACE')
@@ -207,4 +244,9 @@ deallocate(Tot_atom)
 10 format(i8, i8, 3(1x, e12.5))
 20 format(3(1x, e15.9))
 
+
 end program
+
+
+	
+	
