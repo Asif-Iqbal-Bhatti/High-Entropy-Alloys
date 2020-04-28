@@ -4,7 +4,7 @@ program BCC_ScrewDislocation
 !!! USAGE ::: gfortran -o test dislocation.f90; ./test
 !!! AUTHOR::: Asif Iqbal
 !!! DATED ::: 28/04/2020
-!!! GITHUB::: @asifiqbal
+!!! GITHUB::: @asif_em
 !!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
 !!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
 !----------------------------------------------------------------------------
