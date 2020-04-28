@@ -1,18 +1,26 @@
-program BCC_Dislocation
+program BCC_ScrewDislocation
+!----------------------------------------------------------------------------
+!----------------------------------------------------------------------------
+!!! USAGE ::: gfortran -o test dislocation.f90; ./test
+!!! AUTHOR::: Asif Iqbal
+!!! DATED ::: 28/04/2020
+!!! GITHUB::: @asifiqbal
+!!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
+!!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
+!----------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 
-!!! USAGE ::: gfortran -o test dislocation.f90
-
-implicit none
+IMPLICIT NONE
 !------------------------- 
 integer                :: atom_cell, ncelltot, numatomstot, latt_par
-integer                :: i, j, k, l, image_cell, iun, m, numhide
-integer,dimension(4)   :: N
+integer                :: i, j, k, l, image_cell, iun, m
 real(kind=8)           :: R_2, R_3, R_6, delta, d, P
 real(kind=8)           :: burgers, bcc_lat
-real(kind=8)           :: pivalue, pisurtrois, factor, pioversix
-real(kind=8)           :: radius, XDislo, YDislo, xx, yy, zz
+real(kind=8)           :: pivalue, factor
+real(kind=8)           :: radius, xx, yy, zz
 real(kind=8)           :: ux, uy, theta1,theta2,theta3,theta4
 real(kind=8)           :: d1, d2, d3, d4
+integer,dimension(4)   :: N
 real(kind=8),dimension(3)                 :: L0, L1, diag
 real(kind=8),dimension(3)                 :: C1, C2, C3, C4
 real(kind=8),dimension(3)                 :: unit_lat, supercell
@@ -25,11 +33,10 @@ real(kind=8),dimension(:,:,:),allocatable :: Tot_atom
 R_3 = sqrt(3.0d0) ! [111]
 R_6 = sqrt(6.0d0) ! [112]
 R_2 = sqrt(2.0d0) ! [110]
-pivalue = 2.0d0*asin(1.0d0) !* PI value encoded in radians
-pisurtrois = pivalue / 3.0d0
-pioversix = pivalue / 6.0d0
 
-! -- Enter the Ta or Nb lattice parameter obtained from DFT
+!--- PI value encoded in radians
+pivalue = 2.0d0*asin(1.0d0) 
+!--- Enter the Ta or Nb lattice parameter obtained from DFT
 bcc_lat = 3.31953d0
 !------------------------- 
 
@@ -88,8 +95,8 @@ write(*,'(a)') 'Generating Screw Dislocations >>>'
 
 !#***************Position of dislocation line at C1(X, Y, Z) for +b*********
 C1(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C1(1) = 0.25d0*supercell(1) - delta !** X1
-C1(2) = 0.25d0*supercell(2) 				!** Y1
+C1(1) = 0.251d0*supercell(1) - delta !** X1
+C1(2) = 0.251d0*supercell(2) 				!** Y1
 C1(3) = supercell(3) 						!** Z1
 
 write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
@@ -97,8 +104,8 @@ write(*,*) C1(1),C1(2),C1(3)
 
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C2(1) = 0.75d0*supercell(1) + delta !** X2
-C2(2) = 0.25d0*supercell(2) 				!** Y2
+C2(1) = 0.751d0*supercell(1) + delta !** X2
+C2(2) = 0.251d0*supercell(2) 				!** Y2
 C2(3) = supercell(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
@@ -106,17 +113,17 @@ write(*,*) C2(1),C2(2),C2(3)
 
 !#***************Position of dislocation line at C3(X, Y, Z) for -b*********
 C3(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C3(1) = 0.75d0*supercell(1) - delta !** X2
-C3(2) = 0.75d0*supercell(2) 				!** Y2
+C3(1) = 0.251d0*supercell(1) - delta !** X2
+C3(2) = 0.751d0*supercell(2) 				!** Y2
 C3(3) = supercell(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C3(X, Y, Z) for +b >>>'
 write(*,*) C3(1),C3(2),C3(3)
 
-!#***************Position of dislocation line at C4(X, Y, Z) for -b*********
+!#***************Position of dislocation line at C4(X, Y, Z) for +b*********
 C4(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
-C4(1) = 0.25d0*supercell(1) + delta !** X2
-C4(2) = 0.75d0*supercell(2) 				!** Y2
+C4(1) = 0.751d0*supercell(1) + delta !** X2
+C4(2) = 0.751d0*supercell(2) 				!** Y2
 C4(3) = supercell(3) 				!** Z2
 
 write(*,'(a)') 'Position of dislocation line at C4(X, Y, Z) for -b >>>'
@@ -151,33 +158,39 @@ write(*,*) diag
 burgers = bcc_lat*R_3/2.0 ! b=a<111>/2
 
 image_cell = 0
-numhide=0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
    image_cell = image_cell + 1
    do l=1,6
 	 
-    !--- (b/2pi)*tan**(-1)(y/x)
+    !--- (b/2pi)*tan**(-1)(y/x) ""DEF:: numpy.arctan2(x1, x2) x1 = y; x2 = x ""
     xx = Tot_atom(image_cell,l,1)
     yy = Tot_atom(image_cell,l,2)
 		
-    theta1 = datan2((xx-C1(1)),(yy-C1(2) ) )
-    theta2 = datan2((xx-C2(1)),(yy-C2(2) ) )
-    theta3 = datan2((xx-C3(1)),(yy-C3(2) ) )
-    theta4 = datan2((xx-C4(1)),(yy-C4(2) ) )
+    theta1 = datan2( (yy-C1(2) ), (xx-C1(1)) ) ! angle from X -> Y
+    theta2 = datan2( (yy-C2(2) ), (xx-C2(1)) )
+    theta3 = datan2( (yy-C3(2) ), (xx-C3(1)) )
+    theta4 = datan2( (yy-C4(2) ), (xx-C4(1)) )
+
+    !theta1 = datan2( (xx-C1(1)), (yy-C1(2) ) ) ! angle from Y -> X
+    !theta2 = datan2( (xx-C2(1)), (yy-C2(2) ) )
+    !theta3 = datan2( (xx-C3(1)), (yy-C3(2) ) )
+    !theta4 = datan2( (xx-C4(1)), (yy-C4(2) ) )
 		
     !--- Screw dislocation displacement in Z direction
     Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta1)
     Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta2)
-    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta3)
-    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta4)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) - (burgers/(2.0d0*pivalue))*(theta3)
+    Tot_atom(image_cell,l,3) = Tot_atom(image_cell,l,3) + (burgers/(2.0d0*pivalue))*(theta4)
 
    enddo
   enddo
  enddo
-enddo  
- 
+enddo 
+
+!----------------------------------------------------------------------------------- 
+!-----------------------------------------------------------------------------------
 !-----------------------------------------------------------------------------------
 !#****************************** Writing to a file ************************
 dimbox(:,:)=0.0d0; dimbox_pos(:,:)=0.0d0
@@ -189,7 +202,7 @@ dimbox(3,2) = supercell(3); dimbox_pos(3,3) = supercell(3)
 open(1,file='Ta_lammps.lmp',status='REPLACE')
 write(1,*) 'Position data for Fe File'
 write(1,*) 
-write(1,*) 6*ncelltot - numhide, ' atoms'
+write(1,*) 6*ncelltot , ' atoms'
 write(1,*) ' 1 atom types'
 write(1,*) dimbox(1,1:2),' xlo xhi'
 write(1,*) dimbox(2,1:2),' ylo yhi'
@@ -212,6 +225,7 @@ do i=1,N(1)
  enddo
 enddo
 close(1)
+
 !#*************************************************************************
 open(2,file='POSCAR_test',status='REPLACE')
 write(2,'(a)') 'Ta screw'
@@ -220,7 +234,7 @@ write(2,*) dimbox_pos(1,1:3)
 write(2,*) dimbox_pos(2,1:3)
 write(2,*) dimbox_pos(3,1:3)
 write(2,'(a)') 'Ta'
-write(2,*) 6*ncelltot - numhide
+write(2,*) 6*ncelltot 
 write(2,'(a)')'Cartesian'
 
 image_cell=0
@@ -235,8 +249,12 @@ do i=1,N(1)
  enddo
 enddo
 close(2)
+
 !#*************************************************************************
 !-----------------------------------------------------------------------------------
+!-----------------------------------------------------------------------------------
+!-----------------------------------------------------------------------------------
+
 deallocate(Cart_cord)
 deallocate(Tot_atom)
 
