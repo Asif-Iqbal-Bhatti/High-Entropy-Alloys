@@ -5,8 +5,10 @@ program BCC_ScrewDislocation
 !!! AUTHOR::: Asif Iqbal
 !!! DATED ::: 28/04/2020
 !!! GITHUB::: @asif_em
-!!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
-!!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
+!!! Output file  already defined.
+!!! CAUTION: Use at your own risk (NOTEVEN IMPLIED WARRANTY, WHATSOEVER),
+!!! the code has been tested but the user will have to verify the ouput 
+!!! geometry and be vary of the order of the atoms in list.
 !----------------------------------------------------------------------------
 !----------------------------------------------------------------------------
 
