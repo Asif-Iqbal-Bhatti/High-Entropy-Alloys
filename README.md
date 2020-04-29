@@ -1,12 +1,12 @@
 # Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup
 
+**[1] Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup**
+
 |||--> b means burger vector
 
-|||--> b = a*1/2[111] ;|b| = a*sqrt(3)/2
+|||--> b = a*1/2[111] ;|b| = axsqrt(3)/2
 
-|||--> On the (110) plane the slip occur at <1-11> 
-
-|||--> For gamma surface vary b form 0b to 1b
+|||--> On the (110) plane the slip occur at <111> 
 
 NB:: For executation you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
@@ -25,7 +25,7 @@ purposes they can be treated as identical. example:
 slip plane and direction are (110) and [-111], respectively
 ```
 
-**Local-lattice-distortion HEA Alloys**
+**[2] Local-lattice-distortion HEA Alloys**
 
 Analysis of atomic mismatch for High Entropy Alloys. Various definition exists but I have chosen the one given in the paper referenced on the script. These definitions are arbitrary.
 
