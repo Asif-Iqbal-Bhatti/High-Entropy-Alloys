@@ -25,4 +25,10 @@ purposes they can be treated as identical. example:
 slip plane and direction are (110) and [-111], respectively
 ```
 
+**Local-lattice-distortion HEA Alloys**
+
+Analysis of atomic mismatch for High Entropy Alloys. Various definition exists but I have chosen the one given in the paper referenced on the script. These definitions are arbitrary.
+
+The script reads VASP POSCAR & CONTCAR file for initial and final coordinates and then analyse the ions drift from its initial position and compute the atomic mismatch.
+
 
