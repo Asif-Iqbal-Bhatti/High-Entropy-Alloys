@@ -5,10 +5,8 @@ program BCC_ScrewDislocation
 !!! AUTHOR::: Asif Iqbal
 !!! DATED ::: 28/04/2020
 !!! GITHUB::: @asif_em
-!!! Output file  already defined.
-!!! CAUTION: Use at your own risk (NOTEVEN IMPLIED WARRANTY, WHATSOEVER),
-!!! the code has been tested but the user will have to verify the ouput 
-!!! geometry and be vary of the order of the atoms in list.
+!!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
+!!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
 !----------------------------------------------------------------------------
 !----------------------------------------------------------------------------
 
@@ -29,12 +27,12 @@ real(kind=8),dimension(3)                 :: unit_lat, supercell
 real(kind=8),dimension(3,2)               :: dimbox
 real(kind=8),dimension(3,3)               :: dimbox_pos
 real(kind=8),dimension(:,:), allocatable  :: Cart_cord
-real(kind=8),dimension(:,:,:),allocatable :: Tot_atom
+real(kind=8),dimension(:,:,:),allocatable :: Tot_atom, Tot_perfect
 
 !------------------------- PARAMETERS for (111) unit cell
-R_3 = sqrt(3.0d0) ! [111]
 R_6 = sqrt(6.0d0) ! [112]
 R_2 = sqrt(2.0d0) ! [110]
+R_3 = sqrt(3.0d0) ! [111]
 
 !--- PI value encoded in radians
 pivalue = 2.0d0*asin(1.0d0) 
@@ -49,7 +47,7 @@ unit_lat(1) = bcc_lat*R_6       ! a*[1-1-2]=X
 unit_lat(2) = bcc_lat*R_2       ! a*[110]=Y
 unit_lat(3) = bcc_lat*R_3/2.0d0 ! a*[1-11]=Z --> a*<111>/2
 
-! -- Atomic positions within a unitcell (X,Y,Z)
+! -- Atomic positions within a unitcell (X,Y,Z) in Fractional coordinates
 Cart_cord(1,1)=unit_lat(1)*0.0d0        ; Cart_cord(1,2)=unit_lat(2)*0.0d0  ; Cart_cord(1,3)=unit_lat(3)*0.0d0;
 Cart_cord(2,1)=unit_lat(1)*(1.0d0/2.0d0); Cart_cord(2,2)=unit_lat(2)*(0.5d0); Cart_cord(2,3)=unit_lat(3)*(0.0d0)
 Cart_cord(3,1)=unit_lat(1)*(1.0d0/3.0d0); Cart_cord(3,2)=unit_lat(2)*(0.0d0); Cart_cord(3,3)=unit_lat(3)*(2.0d0/3.0d0)
@@ -75,8 +73,9 @@ write(*,*)'Scaling unit cells along Z,', supercell(3)
 
 ncelltot = N(1)*N(2)*N(3)
 allocate(Tot_atom(ncelltot,atom_cell,3))
+allocate(Tot_perfect(ncelltot,atom_cell,3))
 
-!------------------------- Generate the atomic positions for a supercell
+!------------------------- Generate atomic positions for a supercell
 image_cell = 0
 do i=1,N(1)
  do j=1,N(2)
@@ -90,55 +89,50 @@ do i=1,N(1)
   enddo
  enddo
 enddo
+Tot_perfect = Tot_atom
 write(*,*) "Total Number of atoms in the cell is", image_cell*6
 
 write(*,'(a)') ''   
-write(*,'(a)') 'Generating Screw Dislocations >>>' 
-
+write(*,'(a)') 'Generating Screw Dislocations at Position of dislocation line >>>'
 !#***************Position of dislocation line at C1(X, Y, Z) for +b*********
 C1(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
 C1(1) = 0.251d0*supercell(1) - delta !** X1
 C1(2) = 0.251d0*supercell(2) 				!** Y1
 C1(3) = supercell(3) 						!** Z1
-
-write(*,'(a)') 'Position of dislocation line at C1(X, Y, Z) for +b >>>'
-write(*,*) C1(1),C1(2),C1(3)
-
 !#***************Position of dislocation line at C2(X, Y, Z) for -b*********
 C2(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
 C2(1) = 0.751d0*supercell(1) + delta !** X2
 C2(2) = 0.251d0*supercell(2) 				!** Y2
 C2(3) = supercell(3) 				!** Z2
-
-write(*,'(a)') 'Position of dislocation line at C2(X, Y, Z) for -b >>>'
-write(*,*) C2(1),C2(2),C2(3)
-
 !#***************Position of dislocation line at C3(X, Y, Z) for -b*********
 C3(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
 C3(1) = 0.251d0*supercell(1) - delta !** X2
 C3(2) = 0.751d0*supercell(2) 				!** Y2
 C3(3) = supercell(3) 				!** Z2
-
-write(*,'(a)') 'Position of dislocation line at C3(X, Y, Z) for +b >>>'
-write(*,*) C3(1),C3(2),C3(3)
-
 !#***************Position of dislocation line at C4(X, Y, Z) for +b*********
 C4(:) = 0.0d0; delta = 0.001D-01 ! to avoid on top of atom
 C4(1) = 0.751d0*supercell(1) + delta !** X2
 C4(2) = 0.751d0*supercell(2) 				!** Y2
 C4(3) = supercell(3) 				!** Z2
 
-write(*,'(a)') 'Position of dislocation line at C4(X, Y, Z) for -b >>>'
-write(*,*) C4(1),C4(2),C4(3)
-!#*************************************************************************
+print'("C1(X,Y,Z) for +b",3F14.6)', C1(1),C1(2),C1(3)
+print'("C2(X,Y,Z) for -b",3F14.6)', C2(1),C2(2),C2(3)
+print'("C3(X,Y,Z) for +b",3F14.6)', C3(1),C3(2),C3(3)
+print'("C4(X,Y,Z) for -b",3F14.6)', C4(1),C4(2),C4(3)
+!----------------------------------------------------------------------------
 
 d1 = sqrt( (C1(1)-C2(1))**2 + (C1(2)-C2(2))**2 )
 d2 = sqrt( (C1(1)-C3(1))**2 + (C1(2)-C3(2))**2 )
 d3 = sqrt( (C1(1)-C4(1))**2 + (C1(2)-C4(2))**2 )
-write(*,*) '*** Distance between Dipoles >>> ', d1
-write(*,*) '*** Distance between Dipoles >>> ', d2
-write(*,*) '*** Distance between Dipoles >>> ', d3
+print'("*** Distance between Dipoles >>> ",F9.6 )', d1
+print'("*** Distance between Dipoles >>> ",F9.6 )', d2
+print'("*** Distance between Dipoles >>> ",F9.6 )', d3
+print'("Edge lattice constructing from unit cell >>> ")'
+print'("*** h1 = 7e1 >>> ",F9.6)'                , 7*unit_lat(1)
+print'("*** h2 = 3.5e1+5.5e2+0.5e3 >>> ",3F14.6)', 3.5*unit_lat(2), 5.5*unit_lat(2), 0.5*unit_lat(2)
+print'("*** h3 = 2e3 >>> ",F9.6)'                , 2*unit_lat(3) ! For HEAs twice the thickness
 
+!----------------------------------------------------------------------------
 !A periodic array is quadrupole, if the vector d linking the two disloca-
 !tions of opposite signs is equal to 1/2 (u1 +u2), where u1 and u2 are the periodicity
 !vectors of the simulation cell. This ensures that every dislocation is a sym-
@@ -152,29 +146,28 @@ p = sqrt( d**2 - (C2(1)-C1(1))**2 )
 L0=0.0; L1=0.0
 L0(1) = supercell(1)
 L1(2) = supercell(2)
-
 diag = 0.5*(dot_product(L0,L0)+dot_product(L0,L1))/(dot_product(L0,L0)+dot_product(L1,L1)+4*dot_product(L0,L1))
 write(*,*) diag
 	
-! -------------------------------------------------------------------------
+! --------------------Screw dislocation displacement------------------------
 burgers = bcc_lat*R_3/2.0 ! b=a<111>/2
-
 image_cell = 0
 do i=1,N(1)
  do j=1,N(2)
   do k=1,N(3)
    image_cell = image_cell + 1
-   do l=1,6
+   do l=1,atom_cell
 	 
     !--- (b/2pi)*tan**(-1)(y/x) ""DEF:: numpy.arctan2(x1, x2) x1 = y; x2 = x ""
     xx = Tot_atom(image_cell,l,1)
     yy = Tot_atom(image_cell,l,2)
 		
-    theta1 = datan2( (yy-C1(2) ), (xx-C1(1)) ) ! angle from X -> Y
+		! angle from X -> Y This is right
+    theta1 = datan2( (yy-C1(2) ), (xx-C1(1)) )
     theta2 = datan2( (yy-C2(2) ), (xx-C2(1)) )
     theta3 = datan2( (yy-C3(2) ), (xx-C3(1)) )
     theta4 = datan2( (yy-C4(2) ), (xx-C4(1)) )
-
+	
     !theta1 = datan2( (xx-C1(1)), (yy-C1(2) ) ) ! angle from Y -> X
     !theta2 = datan2( (xx-C2(1)), (yy-C2(2) ) )
     !theta3 = datan2( (xx-C3(1)), (yy-C3(2) ) )
@@ -192,16 +185,15 @@ do i=1,N(1)
 enddo 
 
 !----------------------------------------------------------------------------------- 
+!#********************************* Writing to a file ******************************
 !-----------------------------------------------------------------------------------
-!-----------------------------------------------------------------------------------
-!#****************************** Writing to a file ************************
 dimbox(:,:)=0.0d0; dimbox_pos(:,:)=0.0d0
 dimbox(1,2) = supercell(1); dimbox_pos(1,1) = supercell(1)
 dimbox(2,2) = supercell(2); dimbox_pos(2,2) = supercell(2)
 dimbox(3,2) = supercell(3); dimbox_pos(3,3) = supercell(3)
 
 !#*************************************************************************
-open(1,file='Ta_lammps.lmp',status='REPLACE')
+open(1,file='TaScrew_unrelaxed.lmp',status='REPLACE')
 write(1,*) 'Position data for Fe File'
 write(1,*) 
 write(1,*) 6*ncelltot , ' atoms'
@@ -228,15 +220,15 @@ do i=1,N(1)
 enddo
 close(1)
 
-!#*************************************************************************
-open(2,file='POSCAR_test',status='REPLACE')
+!#********************* POSCARScrew_unrelaxed *****************************
+open(2,file='POSCARScrew_unrelaxed',status='REPLACE')
 write(2,'(a)') 'Ta screw'
-write(2,'(a)') '1.0'
-write(2,*) dimbox_pos(1,1:3)
-write(2,*) dimbox_pos(2,1:3)
-write(2,*) dimbox_pos(3,1:3)
+write(2,'(F9.6)') bcc_lat ! bcc_lat = 3.31953d0
+write(2,*) dimbox_pos(1,1:3)/bcc_lat
+write(2,*) dimbox_pos(2,1:3)/bcc_lat
+write(2,*) dimbox_pos(3,1:3)/bcc_lat
 write(2,'(a)') 'Ta'
-write(2,*) 6*ncelltot 
+write(2,'(I7)') 6*ncelltot 
 write(2,'(a)')'Cartesian'
 
 image_cell=0
@@ -245,7 +237,31 @@ do i=1,N(1)
   do k=1,N(3)
    image_cell = image_cell+1
    do l=1,6
-    write(2,20) Tot_atom(image_cell,l,1:3)
+    write(2,20) Tot_atom(image_cell,l,1:3)/bcc_lat
+   enddo
+  enddo
+ enddo
+enddo
+close(2)
+
+!#********************* POSCARScrew_perfect *****************************
+open(3,file='POSCAR_perfect',status='REPLACE')
+write(3,'(a)') 'Ta '
+write(3,'(F9.6)') bcc_lat ! bcc_lat = 3.31953d0
+write(3,*) dimbox_pos(1,1:3)/bcc_lat
+write(3,*) dimbox_pos(2,1:3)/bcc_lat
+write(3,*) dimbox_pos(3,1:3)/bcc_lat
+write(3,'(a)') 'Ta'
+write(3,'(I7)') 6*ncelltot 
+write(3,'(a)')'Cartesian'
+
+image_cell=0
+do i=1,N(1)
+ do j=1,N(2)
+  do k=1,N(3)
+   image_cell = image_cell+1
+   do l=1,6
+    write(3,20) Tot_perfect(image_cell,l,1:3)/bcc_lat
    enddo
   enddo
  enddo
