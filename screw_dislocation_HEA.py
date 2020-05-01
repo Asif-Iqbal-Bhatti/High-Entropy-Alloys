@@ -2,7 +2,7 @@
 
 '''!----------------------------------------------------------------------------
 !----------------------------------------------------------------------------
-!!! USAGE ::: ./python3 <fcc/bcc> <c/d> <screw/sup>
+!!! USAGE ::: ./python3 <fcc/bcc> <c/d> <sup/screw>
 !!! AUTHOR::: Asif Iqbal
 !!! DATED ::: 30/04/2020
 !!! GITHUB::: @asif_em
@@ -32,16 +32,16 @@ def HEAs_supercell():
 	SZ = 5
 	cart_atoms=[]; count=0
 	lat_vec = np.array([[1,0,0],
-											[0,1,0],
-											[0,0,1]])*lat_par
+			[0,1,0],
+			[0,0,1]])*lat_par
 	
 	lattice_bcc = np.array([[0,0,0],
-												[0.5,0.5,0.5]])*lat_par
+		[0.5,0.5,0.5]])*lat_par
 						
 	lattice_fcc = np.array([[0,0,0],
-												[0.0,0.5,0.5],											
-												[0.5,0.0,0.5],											
-												[0.5,0.5,0.0]])*lat_par										
+			[0.0,0.5,0.5],											
+			[0.5,0.0,0.5],											
+			[0.5,0.5,0.0]])*lat_par										
 	fcc = lattice_fcc; 
 	if (sys.argv[1]=='fcc'): b = lat_par*np.sqrt(2)/2.0; print("burger vector::", b)
 	bcc = lattice_bcc; 
@@ -187,8 +187,8 @@ def creating_screw_perfect(rand_atoms, count, basis, lx, ly, lz):
 		fdata1.write("{:12.9f} {:12.9f} {:12.9f}\n".format(basis[0][0]*Nx/lat_par,basis[0][1]*Nx/lat_par,basis[0][2]*Nx/lat_par ))
 		fdata1.write("{:12.9f} {:12.9f} {:12.9f}\n".format(basis[1][0]*Ny/lat_par,basis[1][1]*Ny/lat_par,basis[1][2]*Ny/lat_par ))
 		fdata1.write("{:12.9f} {:12.9f} {:12.9f}\n".format(basis[2][0]*Nz/lat_par,basis[2][1]*Nz/lat_par,basis[2][2]*Nz/lat_par ))			
-		fdata1.write('Ta\n')
-		fdata1.write('{0}\n'.format((int(count))) )	
+		fdata1.write('Ta Hf Zr Nb Ti\n')
+		fdata1.write('{0} {0} {0} {0} {0}\n'.format((int(count/5))) )
 		if (sys.argv[2] == "c" or sys.argv[2] == "C"):
 			fdata1.write("Selective dynamics\n")			
 			fdata1.write("Cartesian\n")	
