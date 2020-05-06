@@ -1,12 +1,37 @@
 program BCC_ScrewDislocation
-!----------------------------------------------------------------------------
-!----------------------------------------------------------------------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!! USAGE ::: gfortran -o test dislocation.f90; ./test
 !!! AUTHOR::: Asif Iqbal
-!!! DATED ::: 28/04/2020
+!!! DATED ::: 04/05/2020
 !!! GITHUB::: @asif_em
 !!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
 !!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
+! Copyright (C) 2020 by Asif Iqbal                                  !
+!                                                                   !
+! asif.bhatti@lspm.cnrs.fr                                          !
+!                                                                   !
+! This program is free software; you can redistribute it and/or     !
+! modify it under the terms of the GNU General Public License       !
+! as published by the Free Software Foundation; either version 2    !
+! of the License, or (at your option) any later version.            !
+!                                                                   !
+! This program is distributed in the hope that it will be useful,   !
+! but WITHOUT ANY WARRANTY; without even the implied warranty of    !
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the      !
+! GNU General Public License for more details.                      !
+!                                                                   !
+! For the full text of the GNU General Public License,              !
+! write to: Free Software Foundation, Inc.,                         !
+!           675 Mass Ave, Cambridge, MA 02139, USA.                 !
+!                                                                   !
+! The GNU GPL can also be found at http://www.gnu.org               !
+!                                                                   !
+! No claim is made that this program is free from errors and        !
+! no liability will be accepted for any loss or damage that         !
+! may result. The user is responsible for checking the validity     !
+! of their results.                                                 !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !----------------------------------------------------------------------------
 !----------------------------------------------------------------------------
 
