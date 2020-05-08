@@ -1,37 +1,13 @@
 program BCC_ScrewDislocation
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!----------------------------------------------------------------------------
+!----------------------------------------------------------------------------
 !!! USAGE ::: gfortran -o test dislocation.f90; ./test
 !!! AUTHOR::: Asif Iqbal
-!!! DATED ::: 04/05/2020
+!!! DATED ::: 08/05/2020
 !!! GITHUB::: @asif_em
 !!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
 !!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
-! Copyright (C) 2020 by Asif Iqbal                                  !
-!                                                                   !
-! asif.bhatti@lspm.cnrs.fr                                          !
-!                                                                   !
-! This program is free software; you can redistribute it and/or     !
-! modify it under the terms of the GNU General Public License       !
-! as published by the Free Software Foundation; either version 2    !
-! of the License, or (at your option) any later version.            !
-!                                                                   !
-! This program is distributed in the hope that it will be useful,   !
-! but WITHOUT ANY WARRANTY; without even the implied warranty of    !
-! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the      !
-! GNU General Public License for more details.                      !
-!                                                                   !
-! For the full text of the GNU General Public License,              !
-! write to: Free Software Foundation, Inc.,                         !
-!           675 Mass Ave, Cambridge, MA 02139, USA.                 !
-!                                                                   !
-! The GNU GPL can also be found at http://www.gnu.org               !
-!                                                                   !
-! No claim is made that this program is free from errors and        !
-! no liability will be accepted for any loss or damage that         !
-! may result. The user is responsible for checking the validity     !
-! of their results.                                                 !
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! Copyright (C) 2020 by Asif Iqbal                                  !
 !----------------------------------------------------------------------------
 !----------------------------------------------------------------------------
 
@@ -58,11 +34,11 @@ real(kind=8),dimension(:,:,:),allocatable :: Tot_atom, Tot_perfect
 R_6 = sqrt(6.0d0) ! [112]
 R_2 = sqrt(2.0d0) ! [110]
 R_3 = sqrt(3.0d0) ! [111]
-
 !--- PI value encoded in radians
-pivalue = 2.0d0*asin(1.0d0) 
-!--- Enter the Ta or Nb lattice parameter obtained from DFT
-bcc_lat = 3.31953d0
+pivalue = 2.0d0*asin(1.0d0)
+
+!--- Enter the Ta or Nb or HEA lattice parameter obtained from DFT
+bcc_lat = 3.38d0
 !------------------------- 
 call random_number(r)
 
@@ -83,8 +59,8 @@ Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Ca
 
 !------------------------- Size of the unit cell !-------------------------
 !!!              Change supercell vector according to your need         !!!
-N(1)=7
-N(2)=11  ! odd
+N(1)=1
+N(2)=1  ! odd
 N(3)=1
 
 supercell(1)=N(1)*unit_lat(1) 
@@ -116,7 +92,7 @@ do i=1,N(1)
  enddo
 enddo
 Tot_perfect = Tot_atom
-print'("Total Number of atoms in the supercell", I8)', image_cell*6
+print'("Total Number of atoms in the supercell", I8)', image_cell*atom_cell
 
 print'(" ")'   
 write(*,'(a)') 'Generating Screw Dislocations (dislo) at Position of dislocation line >>>'
