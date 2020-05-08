@@ -32,4 +32,7 @@ The script reads VASP POSCAR & CONTCAR file for initial and final coordinates an
 **[3] Generating Random Structure by using SQS technique**
 
 Python script to generate BCC/FCC/HCP random structures using SQS technique. This program is the MODIFICATION of the NANOHUB code.
+https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html
+https://github.com/dgehringer/sqsgenerator
+https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
