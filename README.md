@@ -1,4 +1,4 @@
-# Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup
+# Stacking fault energy & Screw dislocations for bcc crystals for VASP setup // ATAT MCSQS code 
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup**
 
@@ -36,3 +36,4 @@ https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html
 https://github.com/dgehringer/sqsgenerator
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
+Convert file generated from MCSQS ATAT code to VASP POSCAR file. 
