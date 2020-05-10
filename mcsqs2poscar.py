@@ -85,9 +85,9 @@ def load_bestsqs():
 		Vx = np.inner(POS_vec[0],u); Vy = np.inner(POS_vec[1],v); Vz = np.inner(POS_vec[2],w)			
 		
 		for i in range(atoms):
-			ax = [float(pos[i][0])*Cart_VX[0], float(pos[i][1])*Cart_VY[0], float(pos[i][2])*Cart_VZ[0] ]
-			ay = [float(pos[i][0])*Cart_VX[1], float(pos[i][1])*Cart_VY[1], float(pos[i][2])*Cart_VZ[1] ]
-			az = [float(pos[i][0])*Cart_VX[2], float(pos[i][1])*Cart_VY[2], float(pos[i][2])*Cart_VZ[2] ]
+			ax = [ pos[i][0]*Cart_VX[0], pos[i][1]*Cart_VY[0], pos[i][2]*Cart_VZ[0] ]
+			ay = [ pos[i][0]*Cart_VX[1], pos[i][1]*Cart_VY[1], pos[i][2]*Cart_VZ[1] ]
+			az = [ pos[i][0]*Cart_VX[2], pos[i][1]*Cart_VY[2], pos[i][2]*Cart_VZ[2] ]
 			fdata2.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(ax,u)/Vx, np.dot(ay,v)/Vy, np.dot(az,w)/Vz ) )	
 
 	fdata2.close()
