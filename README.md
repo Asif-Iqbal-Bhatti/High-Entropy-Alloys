@@ -37,3 +37,5 @@ https://github.com/dgehringer/sqsgenerator
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 Convert file generated from MCSQS ATAT code to VASP POSCAR file. 
+
+**CITATION towards this work should be acknowledged in the paper or any sort of thanks**
