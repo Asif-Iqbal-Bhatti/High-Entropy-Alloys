@@ -41,7 +41,7 @@ def calculate_energy():
 
 #------------------------------------MAIN PROGRAM--------------------------
 
-naccept = 0
+naccept = 0; nreject = 0
 # calculate the old energy
 old_energy   = calculate_energy();
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
@@ -113,9 +113,9 @@ else:
     # reject the move - restore the old coordinates
     nreject += 1
 
-    coords[atom][0] = old_coords[0]
-    coords[atom][1] = old_coords[1]
-    coords[atom][2] = old_coords[2]
+    pos[atom_old][0] = old_coords[0]
+    pos[atom_old][1] = old_coords[1]
+    pos[atom_old][2] = old_coords[2]
     total_energy = old_energy
 
 
