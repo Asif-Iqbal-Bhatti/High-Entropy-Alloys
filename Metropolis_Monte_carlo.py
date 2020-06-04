@@ -11,7 +11,7 @@ import 	multiprocessing as mp
 
 k = 8.617333262145E-5
 T = 300
-sample = 6
+sample = 5
 
 def read_poscar():
 	pos = []; kk = []; lattice = []; sum = 0
@@ -43,7 +43,7 @@ def calculate_energy():
 	old_energy = float ( old_energy )
 	return old_energy
 
-def metropolis_MC(new_energy, old_energy):	
+def metropolis_MC(new_energy, old_energy, old_coords):	
 	naccept = 0; nreject = 0;
 	accept = False;
 	# Automatically accept if the energy goes down
@@ -69,14 +69,15 @@ def metropolis_MC(new_energy, old_energy):
 			pos[atom_old][1] = old_coords[1]
 			pos[atom_old][2] = old_coords[2]
 			total_energy = old_energy
-			
+	return pos
 #------------------------------------MAIN PROGRAM--------------------------
-for i in range(1, sample):	
-	# calculate the old energy
-	old_energy   = calculate_energy();
-	n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-	print ("Energy of the system:", (old_energy), end = '\n')
 	
+# First calculate the energy of the current SQS or SRO structure
+old_energy   = calculate_energy();
+n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
+print ("Energy of the system:", (old_energy), end = '\n')
+
+for i in range(1, sample):	
 	# Pick a random atom (random.randint(a,b) 
 	# picks a random integer between a and b, inclusive. save the old coordinates
 	atom_old   = random.randint(0, n_atoms-1);
@@ -103,7 +104,7 @@ for i in range(1, sample):
 	pos[atom_rand][1] = tmp_2
 	pos[atom_rand][2] = tmp_3
 	
-	#>>>>>>>>>--------------- Writing to a POSCAR File ------------------")
+	#>>>>>>>>>-------- Writing a POSCAR File for new swapping -----------")
 	fdata2 = open('POSCAR_'+str(i).zfill(3),'w')
 	fdata2.write(firstline)
 	fdata2.write("{:12.6f}\n".format(alat) )
@@ -117,10 +118,11 @@ for i in range(1, sample):
 		fdata2.write("{:20.16f} {:20.16f} {:20.16f}\n".format(pos[x][0], pos[x][1], pos[x][2]) )	
 	fdata2.close()
 	#shutil.copyfile("POSCAR_new", "POSCAR_"+str(i).zfill(3))
-	# calculate the new energy
+	
+	# calculate the new energy of the swap atoms
 	new_energy = calculate_energy();
 
-	metropolis_MC(new_energy, old_energy)
+	pos = metropolis_MC(new_energy, old_energy, old_coords)
 
 	
 	
