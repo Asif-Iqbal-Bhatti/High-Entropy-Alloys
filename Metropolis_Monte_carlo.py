@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 #------------------------------------------------------------------------
-# USAGE :: ./python3 
+# USAGE  :: ./python3 
+# Author :: Asif Iqbal
+# DATED  :: 05/06/2020
 # Metropolis Monte Carlo, in a NVT (canonical) ensemble
 # https://chryswoods.com/intro_to_mc/part1/metropolis.html
 # This script calcuates the energy of the system by swapping the atoms
@@ -44,8 +46,16 @@ def read_poscar():
 	return n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype
 
 def calculate_energy():
-	old_energy = os.popen(" grep 'free  energy   TOTEN  =' OUTCAR | tail -1 | awk '{print $5 }' " ).read()
-	old_energy = float ( old_energy )
+	#old_energy = os.popen(" grep 'free  energy   TOTEN  =' OUTCAR | tail -1 | awk '{print $5 }' " ).read()
+	#old_energy = float ( old_energy )
+	f = open('OUTCAR',"r")
+	lines = f.readlines()
+	f.close()
+	for i in lines:
+		word = i.split()
+		if "free  energy   TOTEN  =" in i:
+			ii=lines.index(i)
+	old_energy =  float (lines[ii].split()[4])
 	return old_energy
 
 def metropolis_MC(new_energy, old_energy, old_coords):	
@@ -65,7 +75,7 @@ def metropolis_MC(new_energy, old_energy, old_coords):
 	
 	if accept:
 		# Accept the move
-		naccept += 1; print ("Acceptance ratio:", naccept/sample) 
+		naccept += 1; print ("{} : {:10.6f}".format ( "Accept ratio", naccept/sample)  )
 		total_energy = new_energy
 	else:
 		# reject the move - restore the old coordinates
