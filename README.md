@@ -39,8 +39,8 @@ https://github.com/dgehringer/sqsgenerator
 
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
-Convert file generated from MCSQS ATAT code to VASP POSCAR file. 
+**-->> Convert file generated from MCSQS ATAT code to VASP POSCAR file.**
 
-**[4] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS
+**[4] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
 
 **CITATION toward this work should be acknowledged in the publication, if you are using it.**
