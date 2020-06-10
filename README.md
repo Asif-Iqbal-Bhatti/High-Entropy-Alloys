@@ -32,6 +32,7 @@ The script reads VASP POSCAR & CONTCAR file for initial and final coordinates an
 **[3] Generating Random Structure by using SQS technique**
 
 Python script to generate BCC/FCC/HCP random structures using SQS technique. This program is the MODIFICATION of the NANOHUB code.
+
 https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html 
 
 https://github.com/dgehringer/sqsgenerator 
@@ -39,6 +40,7 @@ https://github.com/dgehringer/sqsgenerator
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 Convert file generated from MCSQS ATAT code to VASP POSCAR file. 
-**[4] Monte Carlo algorithm for generating strucutre with lower Binding energy
 
-**CITATION toward this work should be acknowledged in the publication**
+**[4] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS
+
+**CITATION toward this work should be acknowledged in the publication, if you are using it.**
