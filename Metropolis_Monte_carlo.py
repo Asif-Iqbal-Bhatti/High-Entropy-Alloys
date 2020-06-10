@@ -4,8 +4,7 @@
 # Author :: Asif Iqbal
 # DATED  :: 05/06/2020
 # Metropolis Monte Carlo, in a NVT (canonical) ensemble
-# https://chryswoods.com/intro_to_mc/part1/metropolis.html
-# This script calcuates the energy of the system by swapping the atoms
+# This script calculates the energy of the system by swapping the atoms
 # and invoking the MC code to find the lowest structure.
 #------------------------------------------------------------------------
 
