@@ -6,10 +6,10 @@
 |||--> b = a*1/2[111] ;|b| = axsqrt(3)/2
 |||--> On the (110) plane the slip occur at <111> 
 
-NB:: For executation you will need to install atomsk. The link is:
+NB:: For generating the structure you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
-it generates POSCAR files and these can be run independently with VASP and after relaxation in the z direction
-the energy can be calulated and GSFE can be calculated and plotted against normalized burger vector.
+it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
+the energy can be calulated and GSFE can be plotted against normalized burger vector.
 
 GSFE = (E_fault - E_perfect)/Area
 
