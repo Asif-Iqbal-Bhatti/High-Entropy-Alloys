@@ -2,8 +2,9 @@
 #------------------------------------------------------------------------
 # USAGE  :: ./python3 
 # Author :: Asif Iqbal
-# DATED  :: 05/06/2020
+# DATED  :: 25/06/2020
 # Metropolis Monte Carlo, in a NVT (canonical) ensemble
+# https://chryswoods.com/intro_to_mc/part1/metropolis.html
 # This script calculates the energy of the system by swapping the atoms
 # and invoking the MC code to find the lowest structure.
 #------------------------------------------------------------------------
@@ -14,7 +15,7 @@ import os.path
 
 k = 8.617333262145E-5 # Boltzmann constant
 T = 300 # Temperature in Kelvin
-sample = 6
+sample = 6 # Number of sample could be # of atoms to swap
 
 if os.path.exists('profile.dat'):
 	os.remove('profile.dat') #this deletes the file
