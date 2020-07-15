@@ -1,6 +1,6 @@
-# Stacking fault energy & Screw dislocations for bcc crystals for VASP setup // ATAT MCSQS code 
+# Stacking fault energy & Create Screw dislocations for bcc crystals [VASP setup, ATAT MCSQS code]
 
-**[1] Generate Stacking fault energy & Screw dislocation for bcc crystals for VASP setup**
+**[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
 |||--> b means burger vector
 |||--> b = a*1/2[111] ;|b| = axsqrt(3)/2
