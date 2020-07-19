@@ -3,7 +3,7 @@
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
 |||--> b means burger vector
-|||--> b = a*1/2[111] ;|b| = axsqrt(3)/2
+|||--> b = a*1/2[111] ;|b| = a*sqrt(3)/2
 |||--> On the (110) plane the slip occur at <111> 
 
 NB:: For generating the structure you will need to install atomsk. The link is:
