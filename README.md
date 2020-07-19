@@ -1,4 +1,4 @@
-# Stacking fault energy & Create Screw dislocations for bcc crystals [VASP setup, ATAT MCSQS code]
+# Create random alloys and Stacking fault energy & Screw dislocations for bcc crystals [VASP, ATAT MCSQS code]
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
@@ -43,4 +43,4 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[4] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
 
-**CITATION toward this work should be acknowledged in the publication, if you are using it.**
+**CITATION toward this work should be acknowledged in the publication.**
