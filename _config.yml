@@ -2,7 +2,7 @@ title: High-entropy-alloys
 description: "Generate Stacking fault energy for bcc crystal "
 google_analytics: 
 show_downloads: true
-theme: jekyll-theme-dinky
+theme: jekyll-theme-midnight
 
 gems:
   - jekyll-mentions
