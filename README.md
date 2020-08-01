@@ -1,4 +1,4 @@
-# Stacking fault energy & Screw dislocations for bcc crystals High Entropy Alloys [VASP, ATAT MCSQS code]
+# Stacking fault energy & Screw dislocations for bcc High Entropy Alloys [VASP, ATAT MCSQS code]
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
