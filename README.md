@@ -2,14 +2,7 @@
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
-|||--> b means burger vector
-|||--> b = a*1/2[111] ;|b| = a*sqrt(3)/2
-|||--> On the (110) plane the slip occur at <111> 
-
-NB:: For generating the structure you will need to install atomsk. The link is:
-https://github.com/pierrehirel/atomsk/ 
-it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
-the energy can be calulated and GSFE can be plotted against normalized burger vector.
+--> b means burger vector (--> b = a*1/2[111] ;|b| = a*sqrt(3)/2 --> On the (110) plane the slip occur at <111>)
 
 GSFE = (E_fault - E_perfect)/Area
 
@@ -39,8 +32,13 @@ https://github.com/dgehringer/sqsgenerator
 
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
-**-->> Convert file generated from MCSQS ATAT code to VASP POSCAR file.**
+**[4] Convert file generated from MCSQS ATAT code to VASP POSCAR file.**
 
-**[4] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
+**[5] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
 
 **CITATION toward this work should be acknowledged in the publication.**
+
+NB:: For generating the structure you will need to install atomsk. The link is:
+https://github.com/pierrehirel/atomsk/ 
+it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
+the energy can be calulated and GSFE can be plotted against normalized burger vector.
