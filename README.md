@@ -2,7 +2,7 @@
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
---> b means burger vector (b = a/2[111] ;|b| = axsqrt(3)/2 --> On the (110) plane the slip occur at <111>)
+--> b is a burger vector (b = a/2[111])
 
 GSFE = (E_fault - E_perfect)/Area
 
@@ -22,7 +22,7 @@ Analysis of atomic mismatch for High Entropy Alloys. Various definition exists b
 
 The script reads VASP POSCAR & CONTCAR file for initial and final coordinates and then analyse the ions drift from its initial position and compute the atomic mismatch.
 
-**[3] Generating Random Structure by using SQS technique**
+**[3] Generating Random Structure using SQS technique**
 
 Python script to generate BCC/FCC/HCP random structures using SQS technique. This program is the MODIFICATION of the NANOHUB code.
 
@@ -34,7 +34,7 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[4] Code to convert file generated from MCSQS ATAT code to VASP POSCAR file.**
 
-**[5] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
+**[5] Monte Carlo code for generating strucutre with lower Binding energy for SQS**
 
 **CITATION toward this work should be acknowledged in the publication.**
 
