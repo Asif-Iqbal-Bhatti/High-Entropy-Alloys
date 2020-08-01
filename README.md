@@ -1,8 +1,8 @@
-# Create random alloys and Stacking fault energy & Screw dislocations for bcc crystals [VASP, ATAT MCSQS code]
+# Stacking fault energy & Screw dislocations for bcc crystals High Entropy Alloys [VASP, ATAT MCSQS code]
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
---> b means burger vector (--> b = a*1/2[111] ;|b| = a*sqrt(3)/2 --> On the (110) plane the slip occur at <111>)
+--> b means burger vector (b = a/2[111] ;|b| = axsqrt(3)/2 --> On the (110) plane the slip occur at <111>)
 
 GSFE = (E_fault - E_perfect)/Area
 
@@ -32,7 +32,7 @@ https://github.com/dgehringer/sqsgenerator
 
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
-**[4] Convert file generated from MCSQS ATAT code to VASP POSCAR file.**
+**[4] Code to convert file generated from MCSQS ATAT code to VASP POSCAR file.**
 
 **[5] Monte Carlo algorithm for generating strucutre with lower Binding energy from SQS**
 
