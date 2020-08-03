@@ -15,7 +15,7 @@ import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
 T = 300 # Temperature in Kelvin
-sample = 6 # Number of sample could be # of atoms to swap
+sample = 10 # Number of sample could be # of atoms to swap
 
 if os.path.exists('profile.dat'):
 	os.remove('profile.dat') #this deletes the file
@@ -35,7 +35,7 @@ def read_poscar():
 	nat = [int(i) for i in nat]
 	for i in nat: sum = sum + i
 	n_atoms = sum
-	#print ("Number of atoms:", (n_atoms), end = '\n')	
+	# print ("Number of atoms:", (n_atoms), end = '\n')	
 	# Reading the Atomic positions				
 	for x in range(int(n_atoms)):
 		coord = file.readline().split()
@@ -43,7 +43,7 @@ def read_poscar():
 		pos = pos + [coord]
 	pos = np.array(pos)
 	file.close()
-	return n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype
+	return n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype
 
 def calculate_energy():
 	#old_energy = os.popen(" grep 'free  energy   TOTEN  =' OUTCAR | tail -1 | awk '{print $5 }' " ).read()
@@ -58,8 +58,8 @@ def calculate_energy():
 	old_energy =  float (lines[ii].split()[4])
 	return old_energy
 
-def metropolis_MC(new_energy, old_energy, atom_old, old_coords, naccept, nreject):	
-	total_energy = []
+def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):	
+	tot_energy = []
 	accept = False;
 	# Accept if the energy goes down
 	if (new_energy <= old_energy):
@@ -76,49 +76,54 @@ def metropolis_MC(new_energy, old_energy, atom_old, old_coords, naccept, nreject
 		# Accept the move
 		naccept += 1; 
 		print ("{} : {:10.6f}".format ( "Accept ratio", naccept/sample)  )
-		total_energy = new_energy
+		tot_energy = new_energy
 	else:
 		# reject the move - restore the old coordinates
 		nreject += 1
-		pos[atom_old][0] = old_coords[0]
-		pos[atom_old][1] = old_coords[1]
-		pos[atom_old][2] = old_coords[2]
-		total_energy = old_energy
-	return pos, total_energy
+		print ("{} : {:10.6f}".format ( "Reject ratio", nreject/sample)  )
+		new_pos[0] = old_pos[0]
+		new_pos[1] = old_pos[1]
+		new_pos[2] = old_pos[2]
+		tot_energy = old_energy
+		
+	return new_pos, tot_energy, naccept, nreject
 
 #------------------------------------MAIN PROGRAM--------------------------
 	
 # First calculate the ground/optimized energy of the current SQS or SRO structure
 naccept = 0; nreject = 0; 
-old_energy   = calculate_energy();
+old_energy = calculate_energy();
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-print ("Energy of the starting system:", (old_energy), end = '\n')
+print ("Initial system Energy:", (old_energy), end = '\n')
 
-for i in range(1, sample):	
-	# Pick a random integer atom 1 (random.randint(a,b)) inclusive. save the old coordinates
-	atom_old   = random.randint(0, n_atoms-1);
-	old_coords = ( pos[atom_old][0], pos[atom_old][1], pos[atom_old][2] )
-	#print ("Randomly selected atom", (old_coords), atom_old-1, end = '\n')
-	tmp_1 = pos[atom_old][0]
-	tmp_2 = pos[atom_old][1]
-	tmp_3 = pos[atom_old][2]
+for i in range(1, sample):
+	old_pos = pos
+	# Pick a random integer atom 1 (random.randint(a,b)) inclusive. Save the old coordinates
+	rnd_atm1   = random.randint(0, n_atoms-1);
+	old_coords = ( pos[rnd_atm1][0], pos[rnd_atm1][1], pos[rnd_atm1][2] )
+	#print ("Randomly selected atom", (old_coords), rnd_atm1-1, end = '\n')
+	tmp_1 = pos[rnd_atm1][0]
+	tmp_2 = pos[rnd_atm1][1]
+	tmp_3 = pos[rnd_atm1][2]
 	
 	# Pick a random integer atom 2 (random.randint(a,b)) inclusive. save the old coordinates 
-	atom_rand     = random.randint(0, n_atoms-1);
-	random_coords = ( pos[atom_rand][0], pos[atom_rand][1], pos[atom_rand][2] )
-	#print ("Randomly selected atom", (random_coords), atom_rand-1, end = '\n')
+	rnd_atm2      = random.randint(0, n_atoms-1);
+	#random_coords = ( pos[rnd_atm2][0], pos[rnd_atm2][1], pos[rnd_atm2][2] )
+	#print ("Randomly selected atom", (random_coords), rnd_atm2-1, end = '\n')
 	
 	# Swapping the position of the atoms and writing to a POSCAR file 
 	# and then submitting to VASP to calculate the new energy
-	pos[atom_old][0] = pos[atom_rand][0]
-	pos[atom_old][1] = pos[atom_rand][1]
-	pos[atom_old][2] = pos[atom_rand][2]
+	pos[rnd_atm1][0] = pos[rnd_atm2][0]
+	pos[rnd_atm1][1] = pos[rnd_atm2][1]
+	pos[rnd_atm1][2] = pos[rnd_atm2][2]
 	
-	pos[atom_rand][0] = tmp_1
-	pos[atom_rand][1] = tmp_2
-	pos[atom_rand][2] = tmp_3
+	pos[rnd_atm2][0] = tmp_1
+	pos[rnd_atm2][1] = tmp_2
+	pos[rnd_atm2][2] = tmp_3
 	
-	print ("Swapping atoms", atom_old-1, "and", atom_rand-1, end = '\t')
+	new_pos = pos
+	print ("Swapping atoms", rnd_atm1-1, "and", rnd_atm2-1, end = '\t')
+	
 	#>>>>>>>>>-------- Writing a POSCAR File for new swapping -----------")
 	fdata2 = open('POSCAR_'+str(i).zfill(3),'w')
 	fdata2.write(firstline)
@@ -130,7 +135,7 @@ for i in range(1, sample):
 	fdata2.write(atomtypes)
 	fdata2.write("{}\n".format( Coordtype[0] ) )
 	for x in range(int(n_atoms)):
-		fdata2.write("{:20.16f} {:20.16f} {:20.16f}\n".format(pos[x][0], pos[x][1], pos[x][2]) )	
+		fdata2.write("{:20.16f} {:20.16f} {:20.16f}\n".format(new_pos[x][0], new_pos[x][1], new_pos[x][2]) )	
 	fdata2.close()
 	#>>>>>>>>>-------- Ending a POSCAR File for new swapping -----------")
 	
@@ -146,23 +151,23 @@ for i in range(1, sample):
 	
 	os.chdir('POS_'+str(i).zfill(3))
 	shutil.copyfile('POSCAR_'+str(i).zfill(3), 'POSCAR' )
-	subprocess.call(['sbatch','job.sh'], shell = False)	
 	
+	subprocess.call(['sbatch','job.sh'], shell = False)	
 	time.sleep(15)
 
 	# Calculate the new energy of the swap atoms
 	new_energy = calculate_energy();
-	print ("Energy of the current system:", (new_energy), end = '\t')
+	print ("Current system Energy:", (new_energy), end = '\t')
 	
-	pos, total_energy = metropolis_MC(new_energy, old_energy, atom_old, old_coords, naccept, nreject)
-	old_energy = new_energy
+	new_pos, tot_energy, naccept, nreject = metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject)
+	old_energy = tot_energy
+	pos = new_pos
 
 	os.chdir('../')
 	
 	with open('profile.dat', 'a') as fdata3:
-		fdata3.write ("{:15.8f} {:30.30s}\n".format( total_energy, 'POSCAR_'+str(i).zfill(3) ) )
+		fdata3.write ("{:15.8f} {:30.30s}\n".format( tot_energy, 'POSCAR_'+str(i).zfill(3) ) )
 
 
-	
 	
 	
