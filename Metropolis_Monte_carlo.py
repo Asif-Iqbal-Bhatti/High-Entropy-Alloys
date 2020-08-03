@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 #------------------------------------------------------------------------
-# USAGE  :: ./python3 
+# USAGE  :: python3 monte_carlo_HEA.py 
 # Author :: Asif Iqbal
-# DATED  :: 25/06/2020
-# Metropolis Monte Carlo, in a NVT (canonical) ensemble
-# https://chryswoods.com/intro_to_mc/part1/metropolis.html
+# DATED  :: 03/08/2020
+# Metropolis Monte Carlo in a NVT (canonical) ensemble
+# ADAPTED FROM:: https://chryswoods.com/intro_to_mc/part1/metropolis.html
 # This script calculates the energy of the system by swapping the atoms
 # and invoking the MC code to find the lowest structure.
 #------------------------------------------------------------------------
 
 import numpy as np
 import os, sys, random, subprocess, shutil
-import os.path
+import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
 T = 300 # Temperature in Kelvin
@@ -58,8 +58,8 @@ def calculate_energy():
 	old_energy =  float (lines[ii].split()[4])
 	return old_energy
 
-def metropolis_MC(new_energy, old_energy, old_coords):	
-	naccept = 0; nreject = 0; total_energy = []
+def metropolis_MC(new_energy, old_energy, atom_old, old_coords, naccept, nreject):	
+	total_energy = []
 	accept = False;
 	# Accept if the energy goes down
 	if (new_energy <= old_energy):
@@ -72,10 +72,10 @@ def metropolis_MC(new_energy, old_energy, old_coords):
 			accept = True
 		else:
 			accept = False
-	
 	if accept:
 		# Accept the move
-		naccept += 1; print ("{} : {:10.6f}".format ( "Accept ratio", naccept/sample)  )
+		naccept += 1; 
+		print ("{} : {:10.6f}".format ( "Accept ratio", naccept/sample)  )
 		total_energy = new_energy
 	else:
 		# reject the move - restore the old coordinates
@@ -85,10 +85,11 @@ def metropolis_MC(new_energy, old_energy, old_coords):
 		pos[atom_old][2] = old_coords[2]
 		total_energy = old_energy
 	return pos, total_energy
-	
+
 #------------------------------------MAIN PROGRAM--------------------------
 	
 # First calculate the ground/optimized energy of the current SQS or SRO structure
+naccept = 0; nreject = 0; 
 old_energy   = calculate_energy();
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
 print ("Energy of the starting system:", (old_energy), end = '\n')
@@ -145,11 +146,17 @@ for i in range(1, sample):
 	
 	os.chdir('POS_'+str(i).zfill(3))
 	shutil.copyfile('POSCAR_'+str(i).zfill(3), 'POSCAR' )
+	subprocess.call(['sbatch','job.sh'], shell = False)	
 	
+	time.sleep(15)
+
 	# Calculate the new energy of the swap atoms
 	new_energy = calculate_energy();
-	pos, total_energy = metropolis_MC(new_energy, old_energy, old_coords)
+	print ("Energy of the current system:", (new_energy), end = '\t')
 	
+	pos, total_energy = metropolis_MC(new_energy, old_energy, atom_old, old_coords, naccept, nreject)
+	old_energy = new_energy
+
 	os.chdir('../')
 	
 	with open('profile.dat', 'a') as fdata3:
