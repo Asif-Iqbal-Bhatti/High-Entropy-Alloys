@@ -15,7 +15,7 @@ import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
 T = 300 # Temperature in Kelvin
-sample = 10 # Number of sample could be # of atoms to swap
+sample = 20 # Number of sample could be # of atoms to swap
 
 if os.path.exists('profile.dat'):
 	os.remove('profile.dat') #this deletes the file
@@ -23,7 +23,7 @@ if os.path.exists('profile.dat'):
 def read_poscar():
 	pos = []; kk = []; lattice = []; sum = 0
 	file = open('POSCAR','r')
-	firstline  = file.readline() # IGNORE first line comment
+	firstline  = file.readline() # IGNORE the comment line
 	alat = float( file.readline() )# scale
 	Latvec1 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
 	Latvec2 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
@@ -66,9 +66,9 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 		accept = True
 	else:
 		# Apply the Monte Carlo test and compare
-		# exp( -(E_new - E_old) / kT ) >= rand(0,1)
+		# exp( -(E_new - E_old) / (k*T) ) >= rand(0,1)
 		x = np.exp( -(new_energy - old_energy) / (k*T) )
-		print (x)
+		#print (x)
 		if (x >= random.uniform(0.0,1.0)):
 			accept = True
 		else:
@@ -78,8 +78,6 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 		naccept += 1; 
 		print ("{} : {:10.6f}".format("Accept ratio", naccept/sample)  )
 		tot_energy = new_energy
-		with open('Accept.dat', 'a') as fdata1:
-			fdata1.write ("{:15.8f} {:30.12f}\n".format(tot_energy, naccept/sample ) )
 	else:
 		# reject the move - restore the old coordinates
 		nreject += 1
@@ -92,12 +90,13 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 	return new_pos, tot_energy, naccept, nreject
 
 #------------------------------------MAIN PROGRAM--------------------------
+#------------------------------------MAIN PROGRAM--------------------------
 	
-# First calculate the ground/optimized energy of the current SQS or SRO structure
+# First calculate the relaxed energy of the current SQS or SRO structure
 naccept = 0; nreject = 0; 
-old_energy = calculate_energy();
+old_energy = calculate_energy(); 
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-print ("Initial system Energy:", (old_energy), end = '\n')
+print ("{:20.30s} {:15.8f}".format('____ Initial system Energy', old_energy) )
 
 for i in range(1, sample):
 	old_pos = pos
@@ -114,12 +113,11 @@ for i in range(1, sample):
 	#random_coords = ( pos[rnd_atm2][0], pos[rnd_atm2][1], pos[rnd_atm2][2] )
 	#print ("Randomly selected atom", (random_coords), rnd_atm2-1, end = '\n')
 	
-	# Swapping the position of the atoms and writing to a POSCAR file 
-	# and then submitting to VASP to calculate the new energy
+	# Swapping the position of the two atoms and writing to a POSCAR file 
+
 	pos[rnd_atm1][0] = pos[rnd_atm2][0]
 	pos[rnd_atm1][1] = pos[rnd_atm2][1]
-	pos[rnd_atm1][2] = pos[rnd_atm2][2]
-	
+	pos[rnd_atm1][2] = pos[rnd_atm2][2]	
 	pos[rnd_atm2][0] = tmp_1
 	pos[rnd_atm2][1] = tmp_2
 	pos[rnd_atm2][2] = tmp_3
@@ -159,7 +157,7 @@ for i in range(1, sample):
 	time.sleep(50)
 
 	# Calculate the new energy of the swap atoms
-	new_energy = calculate_energy();
+	#new_energy = calculate_energy();
 	print ("Current system Energy:", (new_energy), end = '\t')
 	
 	new_pos, tot_energy, naccept, nreject = metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject)
