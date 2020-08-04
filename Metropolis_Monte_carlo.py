@@ -68,6 +68,7 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 		# Apply the Monte Carlo test and compare
 		# exp( -(E_new - E_old) / kT ) >= rand(0,1)
 		x = np.exp( -(new_energy - old_energy) / (k*T) )
+		print (x)
 		if (x >= random.uniform(0.0,1.0)):
 			accept = True
 		else:
@@ -75,8 +76,10 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 	if accept:
 		# Accept the move
 		naccept += 1; 
-		print ("{} : {:10.6f}".format ( "Accept ratio", naccept/sample)  )
+		print ("{} : {:10.6f}".format("Accept ratio", naccept/sample)  )
 		tot_energy = new_energy
+		with open('Accept.dat', 'a') as fdata1:
+			fdata1.write ("{:15.8f} {:30.12f}\n".format(tot_energy, naccept/sample ) )
 	else:
 		# reject the move - restore the old coordinates
 		nreject += 1
@@ -100,7 +103,7 @@ for i in range(1, sample):
 	old_pos = pos
 	# Pick a random integer atom 1 (random.randint(a,b)) inclusive. Save the old coordinates
 	rnd_atm1   = random.randint(0, n_atoms-1);
-	old_coords = ( pos[rnd_atm1][0], pos[rnd_atm1][1], pos[rnd_atm1][2] )
+	#old_coords = ( pos[rnd_atm1][0], pos[rnd_atm1][1], pos[rnd_atm1][2] )
 	#print ("Randomly selected atom", (old_coords), rnd_atm1-1, end = '\n')
 	tmp_1 = pos[rnd_atm1][0]
 	tmp_2 = pos[rnd_atm1][1]
@@ -153,7 +156,7 @@ for i in range(1, sample):
 	shutil.copyfile('POSCAR_'+str(i).zfill(3), 'POSCAR' )
 	
 	subprocess.call(['sbatch','job.sh'], shell = False)	
-	time.sleep(15)
+	time.sleep(50)
 
 	# Calculate the new energy of the swap atoms
 	new_energy = calculate_energy();
@@ -166,7 +169,7 @@ for i in range(1, sample):
 	os.chdir('../')
 	
 	with open('profile.dat', 'a') as fdata3:
-		fdata3.write ("{:15.8f} {:30.30s}\n".format( tot_energy, 'POSCAR_'+str(i).zfill(3) ) )
+		fdata3.write (" {:2d} {:15.8f} {:20.25s} {:12.8f} {:12.8f}\n".format(i, new_energy, 'POSCAR_'+str(i).zfill(3), naccept/sample, nreject/sample ))
 
 
 	
