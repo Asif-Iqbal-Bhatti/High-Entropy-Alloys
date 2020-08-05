@@ -14,8 +14,8 @@ import os, sys, random, subprocess, shutil
 import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
-T = 300 # Temperature in Kelvin
-sample = 20 # Number of sample could be # of atoms to swap
+T = 1000 # Temperature in Kelvin
+sample = 10 # Number of sample could be # of atoms to swap
 
 if os.path.exists('profile.dat'):
 	os.remove('profile.dat') #this deletes the file
@@ -96,7 +96,7 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 naccept = 0; nreject = 0; 
 old_energy = calculate_energy(); 
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-print ("{:20.30s} {:15.8f}".format('____ Initial system Energy', old_energy) )
+print ("{:20.30s} {:15.8f}".format('--> Initial system Energy', old_energy) )
 
 for i in range(1, sample):
 	old_pos = pos
@@ -157,12 +157,12 @@ for i in range(1, sample):
 	time.sleep(50)
 
 	# Calculate the new energy of the swap atoms
-	#new_energy = calculate_energy();
+	new_energy = calculate_energy();
 	print ("Current system Energy:", (new_energy), end = '\t')
 	
 	new_pos, tot_energy, naccept, nreject = metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject)
-	old_energy = tot_energy
-	pos = new_pos
+	#old_energy = tot_energy
+	#pos = new_pos
 
 	os.chdir('../')
 	
