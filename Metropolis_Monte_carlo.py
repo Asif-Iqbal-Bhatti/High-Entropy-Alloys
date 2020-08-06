@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------
 # USAGE  :: python3 monte_carlo_HEA.py 
 # Author :: Asif Iqbal
-# DATED  :: 03/08/2020
+# DATED  :: 05/08/2020
 # Metropolis Monte Carlo in a NVT (canonical) ensemble
 # ADAPTED FROM:: https://chryswoods.com/intro_to_mc/part1/metropolis.html
 # This script calculates the energy of the system by swapping the atoms
