@@ -7,6 +7,7 @@
 # ADAPTED FROM:: https://chryswoods.com/intro_to_mc/part1/metropolis.html
 # This script calculates the energy of the system by swapping the atoms
 # and invoking the MC code to find the lowest structure.
+# --->>> In upper directory, there should be CONTCAR & OUTCAR.
 #------------------------------------------------------------------------
 
 import numpy as np
@@ -14,16 +15,16 @@ import os, sys, random, subprocess, shutil
 import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
-T = 1000 # Temperature in Kelvin
-sample = 10 # Number of sample could be # of atoms in POSCAR file
+T = 500 # Temperature in Kelvin
+sample = 10 # Number of sample could be # of atoms to swap
 
 if os.path.exists('profile.dat'):
 	os.remove('profile.dat') #this deletes the file
 				
 def read_poscar():
 	pos = []; kk = []; lattice = []; sum = 0
-	file = open('POSCAR','r')
-	firstline  = file.readline() # IGNORE the comment line
+	file = open('CONTCAR','r')
+	firstline  = file.readline() # IGNORE first line comment
 	alat = float( file.readline() )# scale
 	Latvec1 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
 	Latvec2 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
@@ -66,7 +67,7 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 		accept = True
 	else:
 		# Apply the Monte Carlo test and compare
-		# exp( -(E_new - E_old) / (k*T) ) >= rand(0,1)
+		# exp( -(E_new - E_old) / kT ) >= rand(0,1)
 		x = np.exp( -(new_energy - old_energy) / (k*T) )
 		#print (x)
 		if (x >= random.uniform(0.0,1.0)):
@@ -89,15 +90,13 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 		
 	return new_pos, tot_energy, naccept, nreject
 
-#----------------------------------------------------------------------
-#                          MAIN PART OF THE CODE
-#----------------------------------------------------------------------
+#------------------------------------MAIN PROGRAM--------------------------
 	
-# First calculate the relaxed energy of the current SQS or SRO structure
+# First calculate the ground/optimized energy of the current SQS or SRO structure
 naccept = 0; nreject = 0; 
-old_energy = calculate_energy(); 
+old_energy = calculate_energy();
 n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-print ("{:20.30s} {:15.8f}".format('--> Initial system Energy', old_energy) )
+print (" __-->__ Initial system Energy:", (old_energy), end = '\n')
 
 for i in range(1, sample):
 	old_pos = pos
@@ -114,17 +113,18 @@ for i in range(1, sample):
 	#random_coords = ( pos[rnd_atm2][0], pos[rnd_atm2][1], pos[rnd_atm2][2] )
 	#print ("Randomly selected atom", (random_coords), rnd_atm2-1, end = '\n')
 	
-	# Swapping the position of the two atoms and writing to a POSCAR file 
-
+	# Swapping the position of the atoms and writing to a POSCAR file 
+	# and then submitting to VASP to calculate the new energy
 	pos[rnd_atm1][0] = pos[rnd_atm2][0]
 	pos[rnd_atm1][1] = pos[rnd_atm2][1]
-	pos[rnd_atm1][2] = pos[rnd_atm2][2]	
+	pos[rnd_atm1][2] = pos[rnd_atm2][2]
+	
 	pos[rnd_atm2][0] = tmp_1
 	pos[rnd_atm2][1] = tmp_2
 	pos[rnd_atm2][2] = tmp_3
 	
 	new_pos = pos
-	print ("Swapping atoms", rnd_atm1-1, "and", rnd_atm2-1, end = '\t')
+	print ("{:4s} {:3d} {:4s} {:3d}".format("Swapping atoms",rnd_atm1-1, "and", rnd_atm2-1), end = '\t' )
 	
 	#>>>>>>>>>-------- Writing a POSCAR File for new swapping -----------")
 	fdata2 = open('POSCAR_'+str(i).zfill(3),'w')
@@ -149,7 +149,7 @@ for i in range(1, sample):
 	subprocess.call(['cp','-r','POTCAR','POS_'+str(i).zfill(3)], shell = False)
 	subprocess.call(['cp','-r','KPOINTS','POS_'+str(i).zfill(3)], shell = False)
 	subprocess.call(['cp','-r','job.sh','POS_'+str(i).zfill(3)], shell = False)
-	#subprocess.call(['cp','-r','OUTCAR','POS_'+str(i).zfill(3)], shell = False)
+	subprocess.call(['cp','-r','OUTCAR','POS_'+str(i).zfill(3)], shell = False)
 	
 	os.chdir('POS_'+str(i).zfill(3))
 	shutil.copyfile('POSCAR_'+str(i).zfill(3), 'POSCAR' )
@@ -159,7 +159,7 @@ for i in range(1, sample):
 
 	# Calculate the new energy of the swap atoms
 	new_energy = calculate_energy();
-	print ("Current system Energy:", (new_energy), end = '\t')
+	print("Current system Energy: {:10.6f}".format(new_energy), end = '\t')
 	
 	new_pos, tot_energy, naccept, nreject = metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject)
 	#old_energy = tot_energy
@@ -171,5 +171,5 @@ for i in range(1, sample):
 		fdata3.write (" {:2d} {:15.8f} {:20.25s} {:12.8f} {:12.8f}\n".format(i, new_energy, 'POSCAR_'+str(i).zfill(3), naccept/sample, nreject/sample ))
 
 
-
-
+	
+	
