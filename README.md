@@ -42,3 +42,4 @@ NB:: For generating the structure you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
 it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
 the energy can be calulated and GSFE can be plotted against normalized burger vector.
+http://wolf.ifj.edu.pl/elastic/index.html
