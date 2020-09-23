@@ -6,16 +6,6 @@
 
 GSFE = (E_fault - E_perfect)/Area
 
-```
-Some bcc materials (e.g. α-Fe) can contain up to 48 slip systems. 
-There are six slip planes of type {110}, each with two <111> directions (12 systems). 
-There are 24 {123} and 12 {112} planes each with one <111> direction (36 systems, 
-for a total of 48). While the {123} and {112} planes are not exactly identical in 
-activation energy to {110}, they are so close in energy that for all intents and 
-purposes they can be treated as identical. example: 
-slip plane and direction are (110) and [-111], respectively
-```
-
 **[2] Local-lattice-distortion HEA Alloys**
 
 Analysis of atomic mismatch for High Entropy Alloys. Various definition exists but I have chosen the one given in the paper referenced in the script. These definitions are arbitrary.
