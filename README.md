@@ -1,4 +1,4 @@
-# Stacking fault energy & Screw dislocations for bcc High Entropy Alloys [VASP, ATAT MCSQS code]
+# Stacking fault energy & Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
@@ -32,4 +32,6 @@ NB:: For generating the structure you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
 it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
 the energy can be calulated and GSFE can be plotted against normalized burger vector.
+
+For Elastic constant
 http://wolf.ifj.edu.pl/elastic/index.html
