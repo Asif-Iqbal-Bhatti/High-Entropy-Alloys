@@ -26,6 +26,8 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[5] Monte Carlo code for generating strucutre with lower Binding energy for SQS**
 
+**[6] https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
+
 **CITATION toward this work should be acknowledged in the publication.**
 
 NB:: For generating the structure you will need to install atomsk. The link is:
