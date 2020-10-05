@@ -1,4 +1,4 @@
-# Stacking fault energy & Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]
+Scripts to calculate Stacking fault energy, Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
@@ -12,7 +12,7 @@ Analysis of atomic mismatch for High Entropy Alloys. Various definition exists b
 
 The script reads VASP POSCAR & CONTCAR file for initial and final coordinates and then analyse the ions drift from its initial position and compute the atomic mismatch.
 
-**[3] Generating Random Structure using SQS technique**
+**[3] Generating Random Structure using SQS technique or Short range order (SRO) method**
 
 Python script to generate BCC/FCC/HCP random structures using SQS technique. This program is the MODIFICATION of the NANOHUB code.
 
