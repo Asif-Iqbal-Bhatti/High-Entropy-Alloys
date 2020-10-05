@@ -1,4 +1,4 @@
-Scripts to calculate Stacking fault energy, Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]
+**Scripts to calculate Stacking fault energy, Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]**
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
