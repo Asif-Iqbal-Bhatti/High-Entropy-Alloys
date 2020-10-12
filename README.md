@@ -1,9 +1,8 @@
-**Scripts to calculate Stacking fault energy, Screw dislocations for bcc Refractory High Entropy Alloys [VASP, ATAT MCSQS code]**
+**Calculate G. Stacking fault energy, Screw dislocations 1/2<111> for bcc High Entropy Alloys [VASP, ATAT MCSQS code]**
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
 --> b is a burger vector (b = a/2[111])
-
 GSFE = (E_fault - E_perfect)/Area
 
 **[2] Local-lattice-distortion HEA Alloys**
@@ -29,6 +28,7 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 **[6] https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
 
 **CITATION toward this work should be acknowledged in the publication.**
+**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER**
 
 NB:: For generating the structure you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
