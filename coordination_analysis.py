@@ -30,10 +30,9 @@ def read_poscar():
 	if (Coordtype[0] == 'Direct' or Coordtype[0] == 'direct'): exit("Convert to Cartesian, first!")
 	nat = [int(i) for i in atomtypes.split()]
 	for i in nat: sum = sum + i; n_atoms = sum				
-	for x in range(int(n_atoms)):
-		coord = file.readline().rstrip(" ").split()
-		coord = [ str(i) for i in coord[0:4] ]
-		pos 	= pos + [coord]
+	for x in range(int(n_atoms)):	
+		#coord = [ str(i) for i in file.readline().rstrip(" ").split()[0:4] ]
+		pos.append( [ str(i) for i in file.readline().rstrip(" ").split()[0:4] ] )
 	file.close() 
 	return n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype
 
@@ -44,8 +43,7 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 	Latvec3  = [ float(Latvec3[0]), float(Latvec3[1]), float(Latvec3[2]) ]
 	Latvect  = np.array( [Latvec1[:], Latvec2[:], Latvec3[:]] )
 	for l in range(n_atoms):
-		ll = [float(pos[l][0]), float(pos[l][1]), float(pos[l][2]), pos[l][3] ]
-		mm.append( ll )	
+		mm.append( [float(pos[l][0]), float(pos[l][1]), float(pos[l][2]), pos[l][3] ] )	
 	for l in mm:
 		for i in range(0,Nx,1):            
 			for j in range(0,Ny,1):
@@ -85,7 +83,6 @@ def coordination_analysis(n_atoms, pos):
 
 # Minimum image convention needs to be implemented, to fully account the
 # coordination. It does not work by replicating the system.
-
 def coordination_analysis_replicate_cell(n_atoms, pos, n):
 	# First select the atom around which to measure the coordination.
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
