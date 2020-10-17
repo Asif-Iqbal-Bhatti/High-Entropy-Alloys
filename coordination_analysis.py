@@ -81,7 +81,7 @@ def coordination_analysis(n_atoms, pos):
 	element_counts = Counter(bar_graph)
 	return element_counts, bar_graph
 
-# Minimum image convention needs to be implemented, to fully account the
+# Minimum image convention needs to be implemented, to fully account for the
 # coordination. It does not work by replicating the system.
 def coordination_analysis_replicate_cell(n_atoms, pos, n):
 	# First select the atom around which to measure the coordination.
@@ -92,7 +92,8 @@ def coordination_analysis_replicate_cell(n_atoms, pos, n):
 		j = float(pos[x][1]) - float(pos[r0][1]) 
 		k = float(pos[x][2]) - float(pos[r0][2]) 
 		if ( ( i*i + j*j + k*k ) < rcutoff**2 ): #FILTER
-			cnt +=1; print ( "{:4d} {} {}".format(x, pos[x][:],n[x] ))
+			cnt +=1; bar_graph.append( n[x] )
+			print ( "{:4d} {} {}".format(x, pos[x][:],n[x] ))
 	print ("Coordination # {}, atoms {}".format( cnt, len(pos)) )
 	element_counts = Counter(bar_graph)
 	return element_counts, bar_graph
