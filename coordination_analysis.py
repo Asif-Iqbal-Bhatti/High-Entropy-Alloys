@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 ############################################################################
-# USAGE  :: python3 coordination_analysis.py 
+# USAGE  :: python3 coordination_analysis.py sys.argv[1]
 # Author :: Asif Iqbal
 # DATED  :: 19/10/2020
-# NB		 :: POSCAR should be in Cartesian coordinates.
+# NB	 :: POSCAR should be in Cartesian coordinates.
 # Calculate the coordination around the dislocation line and
-# counts the number and types of atoms within the cutoff radius.
+# counts the number and type of atoms within the cutoff radius.
 # This code reads the POSCAR file with atomic types appended to the last line.
 ############################################################################
 
