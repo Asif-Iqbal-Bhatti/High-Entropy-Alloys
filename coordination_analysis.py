@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 ############################################################################
-# USAGE  :: python3 coordination_analysis.py sys.argv[1]
+# USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
 # Author :: Asif Iqbal
 # DATED  :: 19/10/2020
-# NB	 :: POSCAR should be in Cartesian coordinates.
+# NB		 :: POSCAR should be in Cartesian coordinates.
 # Calculate the coordination around the dislocation line and
-# counts the number and type of atoms within the cutoff radius.
+# count the number and type of atoms within the cutoff radius.
+# Two geometries are implemented: Spherical and Cylindrical.
 # This code reads the POSCAR file with atomic types appended to the last line.
 ############################################################################
 
 import numpy as np
 from scipy import stats 
-import os, sys, random, subprocess, shutil
+import os, sys, random, subprocess, shutil, math
 from matplotlib import pyplot as plt
-import pandas
 from collections import Counter
+
+# Site index and cutoff radius
+r0 = int(sys.argv[1]); rcutoff = float(sys.argv[2]);
 
 def read_poscar():
 	pos = []; kk = []; lattice = []; atom_index = []; sum = 0; dict = {}
@@ -36,10 +39,10 @@ def read_poscar():
 	file.close() 
 	return n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype
 
-def coordination_analysis(n_atoms, pos):
+def coordination_analysis_single_supercell(n_atoms, pos):
 	# First select the atom around which to measure the coordination.
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
-	r0 = 162;	cnt = 0; rcutoff = 3.0; bar_graph = [];	
+	cnt = 0; bar_graph = [];	
 	for x in range(0, int(n_atoms), 1):
 		i = float(pos[x][0]) - float(pos[r0][0]) 
 		j = float(pos[x][1]) - float(pos[r0][1]) 
@@ -59,6 +62,8 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 	Latvect  = np.array( [Latvec1[:], Latvec2[:], Latvec3[:]] )
 	for l in range(n_atoms):
 		atm_pos.append( [float(pos[l][0]), float(pos[l][1]), float(pos[l][2]), pos[l][3] ] )	
+		
+# Creating First and Second layer		
 	for i in range(0,Nx,1):            
 		for j in range(0,Ny,1):
 			for k in range(0,Nz,1): 
@@ -111,7 +116,7 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 		six.append(elementtype)
 		sev.append(atomtypes)
 		
-# Third layer
+# Creating Third layer
 	for i in range(-int(Nx/2),2,1):            
 		for j in range(-int(Ny/2),2,1):
 			for k in range(-int(Nz/2),0,1): 
@@ -121,8 +126,8 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 					atm_typ.append( l[3:4] )	
 				six.append(elementtype)
 				sev.append(atomtypes)			
-				
-#--------------------------------------WRITING TO A FILE----------------------------------
+
+#----------------------------WRITING TO A FILE-----------------------
 	Nx,Ny,Nz = 1,1,1
 	ff = open("POSCAR_222", 'w')
 	ff.write("POSCAR_{}x{}x{}\n".format(Nx,Ny,Nz))
@@ -142,12 +147,10 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 	
 	return  mag_atoms_pos, atm_typ
 
-# Minimum image convention needs to be implemented, to fully account for the
-# coordination. It does not work by replicating the system.
 def coordination_analysis_replicate_cell(n_atoms, pos, n):
 	# First select the atom around which to measure the coordination.
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
-	r0 = int(sys.argv[1]);	cnt = 0; rcutoff = 3.0; bar_graph = [];	
+	cnt = 0; bar_graph = [];	
 	for x in range(0, len(pos), 1):
 		i = float(pos[x][0]) - float(pos[r0][0]) 
 		j = float(pos[x][1]) - float(pos[r0][1]) 
@@ -161,6 +164,37 @@ def coordination_analysis_replicate_cell(n_atoms, pos, n):
 	element_counts = Counter(bar_graph)
 	return element_counts, bar_graph
 	
+def coordination_analysis_Cylindrical_cell(n_atoms, pos):
+	# First construct the cylinder around the dislocation line
+	# I've used (x-x0)**2 + (y-y0)**2 < R**2; theta0 = arctan(y/x); z=z
+	cnt = 0;  bar_graph = [];	
+	# Atom # can be picked by visually looking at the supercell and noticing
+	# the index of the site. 
+	s1 = 69; s2 = 153; s3 = 148
+	# To find the centroid of the triangle geometry around the screw dislocation line	
+	A = ( float(pos[s1][0]), float(pos[s1][1]), float(pos[s1][2]) )
+	B = ( float(pos[s2][0]), float(pos[s2][1]), float(pos[s2][2]) )
+	C = ( float(pos[s3][0]), float(pos[s3][1]), float(pos[s3][2]) ) 
+	x0 = np.mean( [ A[0],B[0],C[0] ] ) 
+	y0 = np.mean( [ A[1],B[1],C[1] ] ) 
+	z0 = np.mean( [ A[2],B[2],C[2] ] ) 
+	
+	r0 = np.sqrt( x0*x0 + y0*y0 )
+	theta = math.degrees( np.arctan(y0/x0) )
+	
+	print("r0,theta=({:5.5f},{:5.5f})".format( r0, theta ) )
+	print("Centroid=({:5.5f},{:5.5f},{:5.5f})".format(x0,y0,z0))
+
+	for x in range(0, len(pos), 1):
+		i = float(pos[x][0]) - x0 
+		j = float(pos[x][1]) - y0 
+		if ( ( np.sqrt(i*i + j*j)  < rcutoff )): # FILTER
+			cnt +=1; bar_graph.append( pos[x][3] )	
+			print ( "{:4d} {} ".format( x, pos[x][:] ) )
+	print ("Coordination # {}, # of atoms in the supercell, {}".format( cnt, len(pos)) )
+	element_counts = Counter(bar_graph)
+	return element_counts, bar_graph
+	
 def plot_bar_from_counter(counter, bar_graph, ax=None):
 	if ax is None:
 		fig = plt.figure()
@@ -169,26 +203,31 @@ def plot_bar_from_counter(counter, bar_graph, ax=None):
 	names = counter.keys()
 	#ax.bar(names, frequencies, align='center')
 	#ax.bar(names, frequencies)
-	plt.hist(bar_graph, bins=20, facecolor='green', alpha=0.75)
+	plt.hist(bar_graph, bins=10, facecolor='red', alpha=0.75)
 	plt.rcParams.update({'figure.figsize':(7,5), 'figure.dpi':300})
 	plt.gca().set(title='Frequency Histogram', ylabel='Frequency');
-	plt.draw()
+	plt.savefig('test.png', format='png', dpi=300)
 	plt.show()
 	return ax
 
-#-------------------------------------MAIN ENGINE-----------------------------------------
+#---------------------MAIN ENGINE--------------------------
 if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_poscar();
-	Burgers = float(Latvec3[2]); # B = a/2<111> which is length along Z=<111>
-	alat = (1 * Burgers ) / np.sqrt(3)
-	
+	# B = a/2<111> which is length along Z=<111>
+	Burgers = float(Latvec3[2]); 	alat = (1 * Burgers ) / np.sqrt(3)
+	print("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> ")
 	print("SYSTEM={}, atoms={} alat={:5.5f}\n".format(elementtype.split(), n_atoms, alat), end='\t' )
 	print("{:5s} {:20.12s} {:15.12s}".format("atom#", "position", "atom type"))
 	
-	mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
-	element_counts, bar_graph = coordination_analysis_replicate_cell(n_atoms, mag_atoms_pos, atm_typ)
+	#element_counts, bar_graph = coordination_analysis_single_supercell(n_atoms, pos)
 	
-	#element_counts, bar_graph = coordination_analysis(n_atoms, pos)
+	''' Uncomment these two lines to turn on the coordination with replicate cells '''
+	#mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
+	#element_counts, bar_graph = coordination_analysis_replicate_cell(n_atoms, mag_atoms_pos, atm_typ)
+	
+	element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
+	
+	''' For plotting turn this on '''
 	plot_bar_from_counter(element_counts, bar_graph)
 	
 	
