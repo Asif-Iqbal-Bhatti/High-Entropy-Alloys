@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #---------------------------------------------
-# Generate coordinate file for generalized stacking fault energy calculation in BCC{110}<111>
-### bcc burger vector = 1/2*[111] slip plane = (110): [111]:x, [112]:y, [110]:z ###
+# Generate coordinate file for generalized stacking fault energy calculation for Ta_{110}<111>
+# bcc burger vector = 1/2*[111] slip plane = (110): [111]:x, [112]:y, [110]:z ###
 #---------------------------------------------
 import os
 import re
