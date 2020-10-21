@@ -2,8 +2,8 @@
 #------------------------------------------------------------------------------------------
 # |||--> b means burger vector
 # |||--> b = a*1/2[111] ;|b| = a*sqrt(3)/2
-# |||--> On the (110) plane the slip occur at <1-11> 
-# |||--> For gamma surface vary b form 0b to 1b
+# |||--> On the (110) plane the slip occur at <1-11> (For bcc structure)
+# |||--> For gamma surface vary b from 0b to 1b
 # Some bcc materials (e.g. α-Fe) can contain up to 48 slip systems. 
 # There are six slip planes of type {110}, each with two <111> directions (12 systems). 
 # There are 24 {123} and 12 {112} planes each with one <111> direction (36 systems, 
@@ -20,7 +20,7 @@ touch burger.dat
 if [ "$1" == "POSCAR110.cif" ]; then
   echo "-vasp"
 else
-	echo "COnvert POSCAR to .cif file. Convert with VESTA software"
+  echo "COnvert POSCAR to .cif file. Convert with VESTA software"
   exit	
 fi 
 	
