@@ -23,9 +23,9 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[4] Code to convert file generated from MCSQS ATAT code to VASP POSCAR file.**
 
-**[5] Monte Carlo code for generating strucutre with lower Binding energy for SQS**
+**[5] Monte Carlo code for generating strucutre with lower Binding energy.**
 
-**[6] https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
+**[6] https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html**
 
 **CITATION toward this work should be acknowledged in the publication.**
 **USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER**
@@ -35,5 +35,5 @@ https://github.com/pierrehirel/atomsk/
 it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
 the energy can be calulated and GSFE can be plotted against normalized burger vector.
 
-For Elastic constant
+**For Elastic constant**
 http://wolf.ifj.edu.pl/elastic/index.html
