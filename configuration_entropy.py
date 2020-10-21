@@ -4,6 +4,7 @@
 # The configuration entropy of a system with non-zero SRO can
 # be estimated using the cluster variation method (CVM) in the 
 # pair approximation [Tamm et al,]
+# NOT SURE ABOUT THIS METHOD. 
 ############################################################################
 import sys, os
 import numpy as np	
