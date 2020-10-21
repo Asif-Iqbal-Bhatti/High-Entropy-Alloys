@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # --------------------
-# USAGE    : This script read foo.txt inputfile. The odering is important!!!
-# NOTE     : A program to generate the SQS structure (either FCC or BCC) by using ATAT mcsqs code
-# INPUTFILE: foo.txt is read by this code. foo.txt is the input parameters file.
-#
-# MODIFICATION of NANOHUB code by Asif Iqbal
+# AUTHOR    : MODIFICATION of NANOHUB code by Asif Iqbal
 # Created on: 30/04/2020 
+# NB        : A program to generate the SQS structure (either FCC or BCC) by using ATAT mcsqs code
+# INPUTFILE : input_paramter.dat is read by this code. input_paramter.dat is the input parameters file.
+# This script read input_paramter.dat inputfile. The odering is important!!!
+# INSTALL ATAT code and executable should be in the path.
 #---------------------
 
 import numpy as np
@@ -15,7 +15,7 @@ import string
 import subprocess
 
 ################# Reading from a file #########################
-fo = open('foo.txt', 'r')
+fo = open('input_paramter.dat', 'r')
 print "Name of the file: ", fo.name
 print " "
 elemcomp = fo.readline()
