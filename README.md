@@ -1,8 +1,6 @@
-
-Calculate G. Stacking fault energy, Screw dislocations 1/2<111> for bcc High Entropy Alloys [VASP, ATAT MCSQS code]**
+# Calculate G. Stacking fault energy, Screw dislocations 1/2<111> for bcc High Entropy Alloys [VASP, ATAT MCSQS code]**
 
 **This script compiles with python 3 or higher version.**
-
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![pypi](https://img.shields.io/pypi/v/pybadges.svg)
 ![versions](https://img.shields.io/pypi/pyversions/pybadges.svg)
