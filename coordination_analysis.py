@@ -2,8 +2,8 @@
 ############################################################################
 # USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
 # Author :: Asif Iqbal
-# DATED  :: 19/10/2020
-# NB		 :: POSCAR should be in Cartesian coordinates.
+# DATED  :: 23/10/2020
+# NB	 :: POSCAR should be in Cartesian coordinates.
 # Calculate the coordination around the dislocation line and
 # count the number and type of atoms within the cutoff radius.
 # Two geometries are implemented: Spherical and Cylindrical.
@@ -15,6 +15,7 @@ from scipy import stats
 import os, sys, random, subprocess, shutil, math
 from matplotlib import pyplot as plt
 from collections import Counter
+from termcolor import colored
 
 # Site index and cutoff radius
 r0 = int(sys.argv[1]); rcutoff = float(sys.argv[2]);
@@ -156,12 +157,16 @@ def coordination_analysis_replicate_cell(n_atoms, pos, n):
 		j = float(pos[x][1]) - float(pos[r0][1]) 
 		k = float(pos[x][2]) - float(pos[r0][2]) 
 		if ( ( i*i + j*j + k*k ) <= rcutoff * rcutoff ): # FILTER
-			cnt +=1; bar_graph.append( n[x][0] )
-			print ( "{:4d} {} {}".format( np.mod(x,n_atoms), pos[x][:], n[x] ))
-	print ("Coordination # {}, # of atoms {} in supercell".format( cnt, len(pos)) )
-	print ("Atom site index is r0=[{},{}]".format( n[r0][0], r0 ))
-	print ( list(bar_graph) )
-	element_counts = Counter(bar_graph)
+			if ( x != r0 ):
+				cnt +=1; 
+				bar_graph.append( n[x][0] ); 
+				print("{:3d} {:4d} {} {}".format( cnt, np.mod(x,n_atoms), pos[x][:], n[x][0] ) );
+
+	print("{:_^50}".format("*"))	
+	print("Coordination around Atom site index, r0=[{},{}], is {}".format( n[r0][0], r0, cnt ) )
+	element_counts = Counter(bar_graph); print ( element_counts )
+	for k,v in element_counts.items():
+		print("P({}-{}) pair is {:9.5f}".format(n[r0][0],k,v/(1*sum(element_counts.values() ) ) ) )	
 	return element_counts, bar_graph
 	
 def coordination_analysis_Cylindrical_cell(n_atoms, pos):
@@ -201,31 +206,32 @@ def plot_bar_from_counter(counter, bar_graph, ax=None):
 		ax = fig.add_subplot(111)
 	frequencies = counter.values()
 	names = counter.keys()
-	#ax.bar(names, frequencies, align='center')
-	#ax.bar(names, frequencies)
-	plt.hist(bar_graph, bins=10, facecolor='red', alpha=0.75)
+	ax.bar(names, frequencies, align='center', alpha=0.5)
+	#plt.hist(bar_graph, bins=10, facecolor='red', alpha=0.75)
 	plt.rcParams.update({'figure.figsize':(7,5), 'figure.dpi':300})
 	plt.gca().set(title='Frequency Histogram', ylabel='Frequency');
-	plt.savefig('test.png', format='png', dpi=300)
-	plt.show()
-	return ax
+	#plt.savefig('Coordination_barPlot.eps', format='eps', dpi=300)
+	#plt.show()
 
 #---------------------MAIN ENGINE--------------------------
 if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_poscar();
 	# B = a/2<111> which is length along Z=<111>
 	Burgers = float(Latvec3[2]); 	alat = (1 * Burgers ) / np.sqrt(3)
-	print("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> ")
-	print("SYSTEM={}, atoms={} alat={:5.5f}\n".format(elementtype.split(), n_atoms, alat), end='\t' )
-	print("{:5s} {:20.12s} {:15.12s}".format("atom#", "position", "atom type"))
-	
+	print(colored("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> ", 'red'))
+	print("SYSTEM={}, atoms={} alat={:5.5f}".format(elementtype.split(), n_atoms, alat) )
+	print("{:-^50}".format("*"))
+	print("{:20.5s} {:20.12s} {:10.12s}".format("atom#", "position", "atom type"))
+	print("{:-^50}".format("*"))
 	#element_counts, bar_graph = coordination_analysis_single_supercell(n_atoms, pos)
 	
 	''' Uncomment these two lines to turn on the coordination with replicate cells '''
-	#mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
-	#element_counts, bar_graph = coordination_analysis_replicate_cell(n_atoms, mag_atoms_pos, atm_typ)
-	
-	element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
+	mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
+	element_counts, bar_graph = coordination_analysis_replicate_cell(n_atoms, mag_atoms_pos, atm_typ)
+	print("{:-^50}".format("*"))	
+
+	''' Uncomment this line to turn on the Cylindrical coordination '''
+	#element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
 	
 	''' For plotting turn this on '''
 	plot_bar_from_counter(element_counts, bar_graph)
