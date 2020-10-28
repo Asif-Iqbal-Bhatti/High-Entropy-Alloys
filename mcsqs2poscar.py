@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
+#---------------------------------------------------------------------------------
 ''' 
->>> This script reads bestsqs.out generated from ATAT mcsqs code.
->>> Please visit https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
->>> Authors :: Asif Iqbal 
->>> DATED 	:: 09/05/2020 PARIS, FRANCE
->>> USAGE		:: python sys.argv[0] bestsqs.out <c/d> 
->>> 
- '''
- 
+# Authors :: Asif Iqbal 
+# DATED   :: 28/10/2020 
+# USAGE	  :: python sys.argv[0] bestsqs.out <c/d> 
+# This script reads bestsqs.out generated from ATAT mcsqs code & convert to POSCAR file
+# Please visit https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
+'''
+#---------------------------------------------------------------------------------
+
 import numpy as np
 import os, sys
 from numpy import linalg as LA
@@ -17,7 +18,7 @@ def load_bestsqs():
 	coord=[]; pos=[]; elem=[]; elem_O=[]; atm_num=[]; count=0; CX=[]; LV=[]
 	
 	content = len( open(sys.argv[1]).readlines( ) )
-	atoms = content-6 # substract 6 because first sixe lines are vectors
+	atoms = content-6 # substract 6 lines because first six lines are vectors
 	print ("-"*50)
 	print("# of atoms", atoms)
 
