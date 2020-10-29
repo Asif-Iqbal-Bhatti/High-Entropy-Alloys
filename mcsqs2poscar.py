@@ -14,6 +14,7 @@
 import numpy as np
 import os, sys
 from numpy import linalg as LA
+from termcolor import colored
 
 def load_bestsqs():
 	coord=[]; pos=[]; elem=[]; elem_O=[]; atm_num=[]; count=0; CX=[]; LV=[]
@@ -78,11 +79,12 @@ def load_bestsqs():
 		fdata2.write("{:12.9s}\n".format("Cartesian"))
 
 		for i in range(atoms):
-			a1 = pos[i][0]*CX[0][0] + pos[i][1]*CX[1][0] + pos[i][2]*CX[2][0]
-			a2 = pos[i][0]*CX[0][1] + pos[i][1]*CX[1][1] + pos[i][2]*CX[2][1]
-			a3 = pos[i][0]*CX[0][2] + pos[i][1]*CX[1][2] + pos[i][2]*CX[2][2]
-			fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( a1, a2, a3 ) )
-			
+			#a1 = pos[i][0]*CX[0][0] + pos[i][1]*CX[1][0] + pos[i][2]*CX[2][0]
+			#a2 = pos[i][0]*CX[0][1] + pos[i][1]*CX[1][1] + pos[i][2]*CX[2][1]
+			#a3 = pos[i][0]*CX[0][2] + pos[i][1]*CX[1][2] + pos[i][2]*CX[2][2]
+			A = np.dot( pos[i][:], CX )
+			fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( A[0], A[1], A[2] ) )
+		
 #------------------------- In fractional/reduced UNITS ----------------#	
 
 	elif (sys.argv[2] == 'd' or sys.argv[2] == 'D' or sys.argv[2] == 'Direct'):	
@@ -91,19 +93,20 @@ def load_bestsqs():
 		v = np.cross(POS_vec[0], POS_vec[2])
 		w = np.cross(POS_vec[0], POS_vec[1])
 		V = np.array([ POS_vec[0],POS_vec[1],POS_vec[2] ] )
-		print ("Volume of the cell::", LA.det(V) )
-		Vx = np.dot(POS_vec[0],u); 
-		Vy = np.dot(POS_vec[1],v); 
-		Vz = np.dot(POS_vec[2],w)			
+		print ("Supercell Volume :: {:9.6f} & Volume/atom :: {:9.6f}".format(LA.det(V), LA.det(V)/atoms ) )
+		Vx = float( np.dot(POS_vec[0],u) )
+		Vy = float( np.dot(POS_vec[1],v) ) 
+		Vz = float( np.dot(POS_vec[2],w) )			
 
 		for i in range(atoms):
-			ax = np.array( [ pos[i][0]*Cart_VX[0], pos[i][1]*Cart_VY[0], pos[i][2]*Cart_VZ[0] ] )
-			#print (ax, u)
-			ay = [ pos[i][0]*Cart_VX[1], pos[i][1]*Cart_VY[1], pos[i][2]*Cart_VZ[1] ]
-			az = [ pos[i][0]*Cart_VX[2], pos[i][1]*Cart_VY[2], pos[i][2]*Cart_VZ[2] ]
-			fdata2.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(ax,u)/Vx, np.dot(ay,v)/Vy, np.dot(az,w)/Vz ) )	
+			#a1 = pos[i][0]*CX[0][0] + pos[i][1]*CX[1][0] + pos[i][2]*CX[2][0]
+			#a2 = pos[i][0]*CX[0][1] + pos[i][1]*CX[1][1] + pos[i][2]*CX[2][1]
+			#a3 = pos[i][0]*CX[0][2] + pos[i][1]*CX[1][2] + pos[i][2]*CX[2][2]
+			A = np.dot( pos[i][:], CX )
+			fdata2.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(A,u)/Vx, np.dot(A,v)/Vy, np.dot(A,w)/Vz ) )	
 
 	fdata2.close()
+	print (colored("File has been generated in {}".format(sys.argv[2]), "yellow" ))
 	
 if __name__ == "__main__":
 	load_bestsqs()
