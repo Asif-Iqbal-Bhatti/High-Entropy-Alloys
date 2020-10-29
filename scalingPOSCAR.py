@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# USAGE :: ./python3 <alat> <POSCAR/CONTCAR>
-# <POSCAR/CONTCAR> should be in Cartesian coordinates
+# AUTHOR :: Asif Iqbal
+# USAGE :: ./python3 sys.argv[0] <alat> <POSCAR/CONTCAR>
+# <POSCAR/CONTCAR> could be in Cartesian/Direct coordinates
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 import numpy as np
 import os, sys
 
-scale = sys.argv[1]
-alat = float(scale)
+scale = sys.argv[1]; alat = float(scale)
 POSCAR = sys.argv[2]
 pos = []; kk = []; lattice = []; sum = 0
-#---------------------------------------------------------
-print('<POSCAR/CONTCAR> should be in Cartesian coordinates:')
 print('Reading File ... :')
 
 file = open(POSCAR,'r')
@@ -30,7 +28,7 @@ nat = [int(i) for i in nat]
 for i in nat: sum = sum + i
 numberofatoms = sum
 print ("Number of atoms:", (numberofatoms), end = '\n')
-#>>>>>>>>>---------------Atomic positions------------------")				
+#                    ---------------Atomic positions------------------			
 for x in range(int(numberofatoms)):
 	coord = file.readline().split()
 	coord = [float(i) for i in coord]
@@ -41,7 +39,7 @@ file.close()
 if (Coordtype[0] == "Direct" or Coordtype[0] == 'D'):
 	#sys.exit("Direct Coordinates detected >>> EXITING <<<")
 
-	#>>>>>>>>>--------------- Writing to a POSCAR File ------------------")
+#                 --------------- Writing to a POSCAR File ------------------
 	fdata2 = open('POSCAR_scale','w')
 	fdata2.write(firstline)
 	fdata2.write("{:12.6f}\n".format(alat) )
