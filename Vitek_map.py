@@ -8,7 +8,7 @@
 #-----------------------------------------------------------------------------------------
 
 import numpy as np
-import os, sys, random, subprocess, shutil, math
+import os, sys, math
 import matplotlib.pyplot as plt
 from ase.visualize.plot import plot_atoms
 from ase import Atoms
@@ -110,44 +110,42 @@ def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
 				
 				if (Struct == 'perf'):
 					#print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
-					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-					format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
+					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n".format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
 				
 				elif (Struct == 'final'):
 					#print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
-					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-					format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
+					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n".format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
 			
 			if  (P_Coordtype[0] == "Cartesian" or P_Coordtype[0] == "cartesian"):
 				
 				if (Struct == 'perf'):
 					#print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(Xp,Yp,Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
-					format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n".format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
 					
 				elif (Struct == 'final'):
 					#print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(Xc,Yc,Zc, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
-					format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n".format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
 			g += 1
 	outfile.close()
 
-def draw_vectors(P_atoms, P_pos, C_pos):
+def draw_vectors():
 	P_ref = read_vasp('POSCAR_perfect')
 	P_pos = P_ref.get_positions()
 	P_ucell = P_ref.get_cell()
 	P_type = P_ref.get_chemical_symbols()
 	P_1 = Atoms(positions=P_pos, symbols=P_type, cell=P_ucell, pbc=[True,True,True])
-
+	
 	C_ref = read_vasp('CONTCAR')
 	C_pos = C_ref.get_positions()
 	C_ucell = C_ref.get_cell()
 	C_type = C_ref.get_chemical_symbols()
 	C_1 = Atoms(positions=C_pos, symbols=C_type, cell=C_ucell, pbc=[True,True,True])
-	
+
 	fig, ax = plt.subplots(2, 1, figsize=(5, 5) )
 	plot_atoms(P_1, ax[0], radii=0.3, rotation=('0x,0y,00z'))
+	ax[0].set_title("POSCAR perfect")
 	plot_atoms(C_1, ax[1], radii=0.3, rotation=('0x,0y,00z'))
+	ax[1].set_title("CONTCAR")	
 	plt.show()
 
 #---------------------------------- MAIN ENGINE ------------------------------------
@@ -158,7 +156,7 @@ if __name__ == "__main__":
 
 	### CHECKING IF THE ATOMS AND ELEMENTS ARE EQUAL in both files
 	if (P_atoms == C_atoms):
-		print ("atoms are equal")
+		print("atoms are equal")
 	else:
 		exit("atoms are not equal")	
 	if (P_elemtype.split()  == C_elemtype.split() ):
@@ -172,7 +170,7 @@ if __name__ == "__main__":
 
 	Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3)
 
-	draw_vectors(P_atoms,P_pos, C_pos)
+	draw_vectors()
 	
 	
 	
