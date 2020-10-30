@@ -11,7 +11,6 @@ import numpy as np
 import os, sys, random, subprocess, shutil, math
 
 Struct = sys.argv[1] # Define the reference structure
-global dict
 	
 def read_POSCAR_perfect():
 	P_pos = []; sum = 0; dict = {}; g = 0
@@ -29,15 +28,6 @@ def read_POSCAR_perfect():
 	for x in range(int(P_atoms)):	
 		P_pos.append( [ str(i) for i in reffile.readline().rstrip(" ").split()[0:3] ] )
 	reffile.close() 
-	### TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT 
-	for j in range( len( P_elemtype.split() )):
-		dict[P_elemtype.split()[j]] =  P_atomtypes.split()[j]; 
-	#print (dict)
-	#for l in dict:
-	#	for k in range( int(dict[l]) ):
-	#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
-	#		print( l, P_pos[g][:] )
-	#		g +=1
 	return P_atoms,P_pos,P_comment,P_alat,P_LV1,P_LV2,P_LV3,P_elemtype,P_atomtypes,P_Coordtype
 
 # THIS function is redundant
@@ -92,42 +82,47 @@ def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
 	# CONTCAR file. I THINK there musr be another way to do that.
 	Mc = np.transpose( [C_LV1,C_LV2,C_LV3] )
 	
-	for j in range(P_atoms):
-		Xp = float(P_pos[j][0]); Yp = float(P_pos[j][1]); Zp = float(P_pos[j][2])
-		Xc = float(C_pos[j][0]); Yc = float(C_pos[j][1]); Zc = float(C_pos[j][2])
-		
-		if (P_Coordtype[0] == "Direct" or P_Coordtype[0] == "direct"):
-		
-			Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
-			Sp = np.dot(Mp, Dp); Sc = np.dot(Mc, Dc); 
-			
-			if (Struct == 'perf'):
-				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
-				format(Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
-				outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-				format(Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
-			
-			elif (Struct == 'final'):
-				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
-				format(Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
-				outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-				format(Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
-
-		
-		if  (P_Coordtype[0] == "Cartesian" or P_Coordtype[0] == "cartesian"):
-			
-			if (Struct == 'perf'):
-				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
-				format(Xp,Yp,Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-				outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
-				format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
-				
-			elif (Struct == 'final'):
-				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
-				format(Xc,Yc,Zc, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-				outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
-				format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
+	dict = {}; g = 0
+	for j in range( len( P_elemtype.split() )):
+		dict[P_elemtype.split()[j]] =  P_atomtypes.split()[j]; 
+	print (dict)
 	
+	for l in dict:
+		for k in range( int(dict[l]) ):
+			Xp = float(P_pos[g][0]); Yp = float(P_pos[g][1]); Zp = float(P_pos[g][2])
+			Xc = float(C_pos[g][0]); Yc = float(C_pos[g][1]); Zc = float(C_pos[g][2])
+			
+			if (P_Coordtype[0] == "Direct" or P_Coordtype[0] == "direct"):
+			
+				Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
+				Sp = np.dot(Mp, Dp); Sc = np.dot(Mc, Dc); 
+				
+				if (Struct == 'perf'):
+					print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+					format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
+					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
+					format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
+				
+				elif (Struct == 'final'):
+					print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+					format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
+					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
+					format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
+			
+			if  (P_Coordtype[0] == "Cartesian" or P_Coordtype[0] == "cartesian"):
+				
+				if (Struct == 'perf'):
+					print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+					format(Xp,Yp,Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )			
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+					format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
+					
+				elif (Struct == 'final'):
+					print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+					format(Xc,Yc,Zc, Xc-Xp, Yc-Yp, Zc-Zp ) )			
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+					format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
+			g += 1
 	outfile.close()
 	
 #---------------------------------- MAIN ENGINE ------------------------------------
@@ -151,9 +146,7 @@ if __name__ == "__main__":
 		exit("Coordinates types are not equal")
 
 	Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3)
-	
-	
-	
+
 	
 	
 	
