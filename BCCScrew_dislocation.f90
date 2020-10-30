@@ -3,7 +3,7 @@ program BCC_ScrewDislocation
 !----------------------------------------------------------------------------
 !!! USAGE ::: gfortran -o test dislocation.f90; ./test
 !!! AUTHOR::: Asif Iqbal
-!!! DATED ::: 08/05/2020
+!!! DATED ::: 30/10/2020
 !!! GITHUB::: @asif_em
 !!! USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER
 !!! CAREFULLY CHECK THE GEOMETRY BEFORE SUBMITTING TO DFT CALCULATION.
@@ -38,7 +38,7 @@ R_3 = sqrt(3.0d0) ! [111]
 pivalue = 2.0d0*asin(1.0d0)
 
 !--- Enter the Ta or Nb or HEA lattice parameter obtained from DFT
-bcc_lat = 3.38d0
+bcc_lat = 3.40d0
 !------------------------- 
 call random_number(r)
 
@@ -57,8 +57,8 @@ Cart_cord(4,1)=unit_lat(1)*(5.0d0/6.0d0); Cart_cord(4,2)=unit_lat(2)*(0.5d0); Ca
 Cart_cord(5,1)=unit_lat(1)*(1.0d0/6.0d0); Cart_cord(5,2)=unit_lat(2)*(0.5d0); Cart_cord(5,3)=unit_lat(3)*(1.0d0/3.0d0)
 Cart_cord(6,1)=unit_lat(1)*(2.0d0/3.0d0); Cart_cord(6,2)=unit_lat(2)*(0.0d0); Cart_cord(6,3)=unit_lat(3)*(1.0d0/3.0d0)
 
-!------------------------- Size of the unit cell !-------------------------
-!!!              Change supercell vector according to your need         !!!
+!-------------------------! Size of the unit cell !-------------------------
+!!!              Change supercell vector according to your need          !!!
 N(1)=1
 N(2)=1  ! odd
 N(3)=1
@@ -150,6 +150,7 @@ print'("------------------------------------------------------------------------
 !vectors of the simulation cell. This ensures that every dislocation is a sym-
 !metry center of the array: fixing, as a convention, the origin at a dislocation center,
 !if a dislocation b is located at the position r, there will also be a dislocation b in −r.
+!----------------------------------------------------------------------------
 
 d = (supercell(1) + supercell(2))/2.0
 print'("Vector d linking the two +b & -b  >>> ",2F14.6)', d, d-d1
@@ -284,8 +285,6 @@ enddo
 close(2)
 
 !#*************************************************************************
-!-----------------------------------------------------------------------------------
-!-----------------------------------------------------------------------------------
 !-----------------------------------------------------------------------------------
 
 deallocate(Cart_cord)
