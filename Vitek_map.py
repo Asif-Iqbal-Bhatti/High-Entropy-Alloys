@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
-
+#-----------------------------------------------------------------------------------------
+# AUTHOR:: ASIF IQBAL
+# USAGE :: python3 sys.argv[0] <perf/final>
+# NB :: To plot Differential displacement map. ADAPTATION FROM CLOUET and ATOMMAN et al.,
 #https://en.wikipedia.org/wiki/Fractional_coordinates#Conversion_to_cartesian_coordinates
 #http://www.ruppweb.org/Xray/tutorial/Coordinate%20system%20transformation.htm
+#-----------------------------------------------------------------------------------------
 
 import numpy as np
 import os, sys, random, subprocess, shutil, math
 
-Struct = sys.argv[1]
+Struct = sys.argv[1] # Define the reference structure
 
 def read_POSCAR_perfect():
 	P_pos = []; sum = 0; dict = {}; g = 0
@@ -34,15 +38,19 @@ def read_POSCAR_perfect():
 	#		print( l, P_pos[g][:] )
 	#		g +=1
 	return P_atoms,P_pos,P_comment,P_alat,P_LV1,P_LV2,P_LV3,P_elemtype,P_atomtypes,P_Coordtype
-	
+
+# THIS function is redundant
 def read_CONTCAR():
-	C_pos = []; sum = 0; dict = {}; g = 0
+	C_pos = []; sum = 0; C_LV1 = []; C_LV2 = []; C_LV3 = []
 	inpfile = open('CONTCAR','r')
 	C_comment  = inpfile.readline() # IGNORE first line comment
 	C_alat       = float( inpfile.readline() )# scale
-	C_LV1 = inpfile.readline().split()
-	C_LV2 = inpfile.readline().split()
-	C_LV3 = inpfile.readline().split() 
+	C1 = inpfile.readline().split();
+	C2 = inpfile.readline().split();
+	C3 = inpfile.readline().split();
+	for ai in C1: C_LV1.append(float(ai))
+	for bi in C2: C_LV2.append(float(bi))
+	for ci in C3: C_LV3.append(float(ci))
 	C_elemtype= inpfile.readline()
 	C_atomtypes  = inpfile.readline()
 	C_Coordtype  = inpfile.readline().split()
@@ -55,39 +63,31 @@ def read_CONTCAR():
 	
 #### math.sin function takes argument in radians ONLY
 #### Ordering of returning angles variables does matter
-def Conversion_2_cartesian_coordinates(P_LV1,P_LV2,P_LV3):
+def Conversion_2_cartesian_coordinates(LV1,LV2,LV3):
 	a=[]; b=[]; c=[];
-	for ai in P_LV1: a.append(float(ai))
-	for bi in P_LV2: b.append(float(bi))
-	for ci in P_LV3: c.append(float(ci))
-	x = np.linalg.norm(a)
-	y = np.linalg.norm(b)		
-	z = np.linalg.norm(c)	
+	for ai in LV1: a.append(float(ai)); x = np.linalg.norm(a)
+	for bi in LV2: b.append(float(bi)); y = np.linalg.norm(b)
+	for ci in LV3: c.append(float(ci)); z = np.linalg.norm(c)
 	### gamma = Cos-1( (a.b)/||a||.||b|| )
 	### alpha = Cos-1( (b.c)/||b||.||c|| )
 	### beta  = Cos-1( (a.c)/||a||.||c|| )
-	P_gamma = math.acos(np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-	P_alpha = math.acos(np.dot(b,c) / (np.linalg.norm(b) * np.linalg.norm(c)))
-	P_beta  = math.acos(np.dot(a,c) / (np.linalg.norm(a) * np.linalg.norm(c)))
-	
+	P_gamma = math.acos(np.dot(a,b) / (x * y))
+	P_alpha = math.acos(np.dot(b,c) / (y * z))
+	P_beta  = math.acos(np.dot(a,c) / (x * z))
 	V = x*y*z * ( np.sqrt(1 + 2 * math.cos(P_alpha) * math.cos(P_beta) * \
 	math.cos(P_gamma) - math.cos(P_alpha)**2 - math.cos(P_beta)**2 - math.cos(P_gamma)**2) )	
-	
 	M = [ [x, y * math.cos(P_gamma), z * math.cos(P_beta)],
 			[0, y * math.sin(P_gamma), z * ( math.cos(P_alpha) - math.cos(P_beta) * math.cos(P_gamma) )/math.sin(P_gamma) ],  
 			[0, 0, V / (x * y * math.sin(P_gamma)) ] ]
-	
 	return M
 
-#---------------------MAIN ENGINE--------------------------
-#---------------------MAIN ENGINE--------------------------
+#---------------------------------- MAIN ENGINE ------------------------------------
+
 if __name__ == "__main__":
 	P_atoms,P_pos,P_comment,P_alat,P_LV1,P_LV2,P_LV3,P_elemtype,P_atomtypes,P_Coordtype = read_POSCAR_perfect();	
 	C_atoms,C_pos,C_comment,C_alat,C_LV1,C_LV2,C_LV3,C_elemtype,C_atomtypes,C_Coordtype = read_CONTCAR();	
-	
-	M = Conversion_2_cartesian_coordinates(P_LV1,P_LV2,P_LV3)
 
-	#                  !!! CHECKING IF THE ATOMS AND ELEMENTS ARE EQUAL !!!
+	# CHECKING IF THE ATOMS AND ELEMENTS ARE EQUAL in both files
 	if (P_atoms == C_atoms):
 		print ("atoms are equal")
 	else:
@@ -103,29 +103,51 @@ if __name__ == "__main__":
 
 	#----------------------!!! WRITING TO A DISPLACEMENT FILE !!! ----------------------
 	outfile = open("displacement.yaml", 'w')
-	
 	outfile.write("{:5d}\n".format(P_atoms) )
 	outfile.write("Atom Types refFile Xp Yp Zp displacement Xc-Xp, Yc-Yp, Zc-Zp\n".format() )
+	
+	Mp = Conversion_2_cartesian_coordinates(P_LV1,P_LV2,P_LV3)
+	# This is a technical bcz the lattice vectors of the CONTCAR file does not
+	# conform the matrix M that is generated from the "Conversion_..." routine
+	# So what I have done here is just directly take the lattice vectors from the 
+	# CONTCAR file. I THINK there musr be another way to do that.
+	Mc = np.transpose( [C_LV1,C_LV2,C_LV3] )
 	
 	for j in range(P_atoms):
 		Xp = float(P_pos[j][0]); Yp = float(P_pos[j][1]); Zp = float(P_pos[j][2])
 		Xc = float(C_pos[j][0]); Yc = float(C_pos[j][1]); Zc = float(C_pos[j][2])
-		Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
-		Sp = M @ np.transpose(Dp); Sc = M @ np.transpose(Dc)
 		
-		print ( Sc )
-		#print ( "{:15.16f} {:15.16f} {:15.16f}".format( Xc-Xp, Yc-Yp, Zc-Zp ) )
+		if (P_Coordtype[0] == "Direct" or P_Coordtype[0] == "direct"):
 		
-		if (Struct == 'perf'):
-			outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-		format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
-		elif (Struct == 'final'):
-			outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
-		format(Xc, Yc, Zc, Xp-Xc, Yp-Yc, Zp-Zc ) )	
-	
-	
-	
-	
+			Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
+			Sp = np.dot(Mp, Dp); Sc = np.dot(Mc, Dc); 
+			
+			if (Struct == 'perf'):
+				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+				format(Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
+				outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
+				format(Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
+			
+			elif (Struct == 'final'):
+				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+				format(Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
+				outfile.write("{:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n". \
+				format(Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
+
+		
+		if  (P_Coordtype[0] == "Cartesian" or P_Coordtype[0] == "cartesian"):
+			
+			if (Struct == 'perf'):
+				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+				format(Xp,Yp,Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )			
+				outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+				format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
+				
+			elif (Struct == 'final'):
+				print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}". \
+				format(Xc,Yc,Zc, Xc-Xp, Yc-Yp, Zc-Zp ) )			
+				outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+				format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
 	
 	outfile.close()
 	
