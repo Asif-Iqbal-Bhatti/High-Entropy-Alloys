@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.6
 
 '''
-
-AUTHOR: ASIF IQBAL BHATTI
-USAGE: python3 sys.argv[0]
-DATED: 18/01/2020
-
+#-------------------------------------------------------------------------------------------------
+#AUTHOR :: ASIF IQBAL BHATTI
+#USAGE  :: python3 sys.argv[0]
+#DATED  :: 18/08/2020
+#-------------------------------------------------------------------------------------------------
 '''
 
 import numpy as np
@@ -25,7 +25,7 @@ def local_lattice_distortion(a1,b1,c1):
 	d_square_mean = (a**2 + b**2 + c**2)/3
 	g = np.sqrt( d_square_mean/(d_mean)**2 - 1 )
 	return g
-	###
+
 # Song, H. et al. Local lattice distortion in high-entropy alloys. Phys. Rev. Mater. 1, 23404 (2017).
 # Senkov, O. N. & Miracle, D. B. Effect of the atomic size distribution on glass forming ability of amorphous metallic alloys. Mater. Res. Bull. 36, 2183–2198 (2001).
 # Takeuchi, A. et al. Entropies in alloy design for high-entropy and bulk glassy alloys. Entropy 15, 3810–3821 (2013).	
@@ -54,7 +54,6 @@ def local_lattice_distortion_DEF1():
 		del_sum = del_sum + C * ( 1 - float(eta[j]) / r_avg )**2
 	del_sum = 100 * np.sqrt(del_sum) 	
 	print("HEA_atomic_size_mismatch: \u03B4={}".format(del_sum))
-###
 	
 def local_lattice_distortion_DEF2():
 	print ("Song, H. et al. Local lattice distortion in high-entropy alloys.")
