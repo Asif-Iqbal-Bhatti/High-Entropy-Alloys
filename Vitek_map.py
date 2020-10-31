@@ -2,6 +2,7 @@
 #-----------------------------------------------------------------------------------------
 # AUTHOR:: ASIF IQBAL
 # USAGE :: python3 sys.argv[0] <perf/final>
+# DATED :: 31/10/2020
 # NB :: To plot Differential displacement map. ADAPTATION FROM CLOUET and ATOMMAN et al.,
 # https://en.wikipedia.org/wiki/Fractional_coordinates#Conversion_to_cartesian_coordinates
 # http://www.ruppweb.org/Xray/tutorial/Coordinate%20system%20transformation.htm
@@ -16,7 +17,10 @@ from ase.io import write, read
 from ase.io.vasp import write_vasp, read_vasp
 
 Struct = sys.argv[1] # Define the reference structure
-Per_Z = True
+Per_Z  = True
+Per_Y  = False
+Per_XY = False
+DEBUG  = False
 
 def read_POSCAR_perfect():
 	P_pos = []; sum = 0; P_LV1 = []; P_LV2 = []; P_LV3 = []
@@ -154,14 +158,15 @@ def plot_supercell():
 	ax[1].set_title("CONTCAR")	
 	plt.show()
 
-# FOR BCC STRUCTURE ONLY
+#----------------------!!! FOR BCC STRUCTURE ONLY
 def Vitek_map(P_atoms): 
 	alat = 3.38 # Angstrom
 	bz = alat/2 * np.sqrt(3)
 	# Half distance between 1st and 2nd n.n.
 	Rcut2 = ( 1/2 * alat * (np.sqrt(6)/3 + np.sqrt(2)) )**2
-	tmp = []
-	P_x = []; P_y = []; P_z = []; P_gradx = []; P_grady = []; P_gradz = []; 
+	print ("{} {}".format(alat, bz) )
+	P_x = []; P_y = []; P_z = []; tmp = []
+	P_gradx = []; P_grady = []; P_gradz = []; 
 	
 	disp_file = open('displacement.yaml', 'r')
 	disp_file.readline().strip("\n").split() # first line comment
@@ -197,10 +202,8 @@ def Vitek_map(P_atoms):
 		for i in range (P_atoms):
 			P_z[i] = P_z[i]  - math.floor( P_z[i] /bz )*bz
 
-
-  ### ============== File containing points of the different planes ==================
+  ### File containing points of the different planes 
 	points = open("points.yaml","w")
-
 	z0 = min(P_z) + bz/6.
 	
 	### Atom positions corresponding to 1st (111) plane
@@ -212,7 +215,7 @@ def Vitek_map(P_atoms):
 			points.write('{:14.6f} {:14.6f} {:14.6f}\n'.format( P_x[i], P_y[i], P_z[i] ) )
 	points.write("\n")
 
-  ### Atom positions corresponding to 2nd (111) plane
+	### Atom positions corresponding to 2nd (111) plane
 	for i in range (P_atoms):
 		if ( (3.0*np.mod(P_z[i]-z0,bz) >= bz) and (3.0*np.mod(P_z[i]-z0,bz) < 2.0*bz) ):
 			points.write('{:14.6f} {:14.6f} {:14.6f}\n'.format( P_x[i], P_y[i], P_z[i] ) )
@@ -225,8 +228,64 @@ def Vitek_map(P_atoms):
 	
 	points.close()
 	
-
+	### Output file for screw components 
+	res = open("res.yaml","w")
+	res.write('# [0.0, 0.0, {}] (Burgers vector)\n'.format(bz)         )
+	res.write('# [0.0, 0.0, 1.0] (line direction)\n'           )
+	res.write('# 1-3: RefFile x, y, and z coordinates\n'             )
+	res.write('# 4-6: FinalFile x, y, and z coordinates\n'           )
+	res.write('#   7: displacement difference uz2-uz1 along b\n' )
+	res.write('# 8-9: atom indexes i and j\n'                    )
 	
+	### Computing the arrows in the <111> directions
+	z0 = min( P_z ) + 2.0*bz
+	dRij_shift  = 0.0   # Shift to apply to position of j atom for PBC
+	imVitek = P_atoms   # Number of atoms for Vitek maps including periodic images
+	at = [P_LV1, P_LV2, P_LV3]
+	inv_at = np.linalg.inv( at ) # INVERSE of a lattice vector
+
+	for i in range( P_atoms-1 ):  # i>j
+		if ( P_z[i] > z0): continue
+		for j in range(i+1, P_atoms):
+			if ( P_z[j] > z0): continue
+			dRij = [ P_x[j] - P_x[i], P_y[j] - P_y[i], P_z[j] - P_z[i] ]
+
+			if (Per_XY):
+				dSij = np.dot( inv_at, dRij )
+				if ( ( round( dSij[0] ) != 0 ) or ( round(dSij[1]) != 0 ) ):
+					if (DEBUG):
+						res.write('before: dRij = {}'.format( dRij ) )
+						dSij = dSij - round( dSij )
+						res.write('after: dRij = {}'.format( np.dot( at, dSij )) )
+						res.write('=> dR2 = {}', dRij[0]**2 + dRij[1]**2 )
+						res.write("")
+					dSij = dSij - round( dSij )
+					dRij_shift = np.dot( at, dSij ) - dRij
+					dRij = dRij + dRij_shift
+					Per_Y = True # We are considering a periodic image of j
+				else:
+					dRij_shift = 0.0
+					Per_Y = False # We are not considering a periodic image of j
+
+			R2 = dRij[0]**2 + dRij[1]**2
+			if (R2 > Rcut2): continue
+			if (R2 <= 1.0E-8): continue
+			if (Per_XY):
+				imVitek = imVitek + 1
+				jVitek = imVitek
+			else:
+				jVitek = j
+			inv_R = 1/np.sqrt(R2)
+			Dgradr = [ P_gradx[j] - P_gradx[i], P_grady[j] - P_grady[i] ]  
+			Dgradz = P_gradz[j] - P_gradz[i]
+			Dgradz = Dgradz - bz*round(Dgradz/bz)
+			
+			res.write("{:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:2d} {:2d}\n". \
+			format(P_x[i], P_y[i], P_z[i], P_x[j], P_y[j], P_z[j] + dRij_shift, Dgradz, i, jVitek ) )
+			
+			res.write("{:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:12.6f} {:2d} {:2d}\n". \
+			format(P_x[i], P_y[i], P_z[i], P_x[j], P_y[j], P_z[j] + dRij_shift, Dgradr, i, jVitek ) )			
+	res.close()
 	
 #---------------------------------- MAIN ENGINE ------------------------------------
 
