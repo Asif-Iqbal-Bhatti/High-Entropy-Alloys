@@ -16,7 +16,8 @@ from ase.io import write, read
 from ase.io.vasp import write_vasp, read_vasp
 
 Struct = sys.argv[1] # Define the reference structure
-	
+Per_Z = True
+
 def read_POSCAR_perfect():
 	P_pos = []; sum = 0; P_LV1 = []; P_LV2 = []; P_LV3 = []
 	reffile = open('POSCAR_perfect','r')
@@ -79,11 +80,10 @@ def Conversion_2_cartesian_coordinates(LV1,LV2,LV3):
 			[0, 0, V / (x * y * math.sin(P_gamma)) ] ]
 	return M
 
-
+#----------------------!!! WRITING TO A DISPLACEMENT FILE !!! ----------------------
 def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
-	#----------------------!!! WRITING TO A DISPLACEMENT FILE !!! ----------------------
 	outfile = open("displacement.yaml", 'w')
-	outfile.write("{:5d}\n".format(P_atoms) )
+	outfile.write("{:3d}\n".format(P_atoms) )
 	outfile.write("Atom Types refFile Xp Yp Zp displacement Xc-Xp, Yc-Yp, Zc-Zp\n".format() )
 	
 	Mp = Conversion_2_cartesian_coordinates(P_LV1,P_LV2,P_LV3)
@@ -93,7 +93,7 @@ def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
 	# CONTCAR file. I THINK there musr be another way to do that.
 	Mc = np.transpose( [C_LV1,C_LV2,C_LV3] )
 	
-	dict = {}; g = 0
+	dict = {}; g = 0;
 	for j in range( len( P_elemtype.split() )):
 		dict[P_elemtype.split()[j]] =  P_atomtypes.split()[j]; 
 	print (dict)
@@ -102,33 +102,39 @@ def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
 		for k in range( int(dict[l]) ):
 			Xp = P_pos[g][0]; Yp = P_pos[g][1]; Zp = P_pos[g][2]
 			Xc = C_pos[g][0]; Yc = C_pos[g][1]; Zc = C_pos[g][2]
-
+			Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
+			
 			if (P_Coordtype[0] == "Direct" or P_Coordtype[0] == "direct"):
 			
-				Dp = [Xp, Yp, Zp]; Dc = [Xc, Yc, Zc]
-				Sp = np.dot(Mp, Dp); Sc = np.dot(Mc, Dc); 
+				# Conversion to Cartesian coordinates
+				Sp = Mp @ np.transpose(Dp); Sc = Mc @ np.transpose(Dc); 
 				
 				if (Struct == 'perf'):
-					#print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
-					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n".format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 
-				
+					#print ("{:2s} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f}".format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  )) 			
+					outfile.write("{:2s} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f}\n". \
+					format(l, Sp[0], Sp[1], Sp[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2]  ))
+					
 				elif (Struct == 'final'):
-					#print ("{:2s} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
-					outfile.write("{:2s} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f} {:25.16f}\n".format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
+					#print ("{:2s} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f}".format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))			
+					outfile.write("{:2s} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f} {:20.16f}\n". \
+					format(l, Sc[0], Sc[1], Sc[2], Sc[0]-Sp[0], Sc[1]-Sp[1], Sc[2]-Sp[2] ))	
 			
 			if  (P_Coordtype[0] == "Cartesian" or P_Coordtype[0] == "cartesian"):
 				
 				if (Struct == 'perf'):
 					#print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(Xp,Yp,Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n".format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+					format(Xp, Yp, Zp, Xc-Xp, Yc-Yp, Zc-Zp ) )
 					
 				elif (Struct == 'final'):
 					#print ("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}".format(Xc,Yc,Zc, Xc-Xp, Yc-Yp, Zc-Zp ) )			
-					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n".format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
+					outfile.write("{:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f} {:15.12f}\n". \
+					format(Xc, Yc, Zc, Xc-Xp, Yc-Yp, Zc-Zp  ) )	
 			g += 1
 	outfile.close()
+	return 0
 
-def draw_vectors():
+def plot_supercell():
 	P_ref = read_vasp('POSCAR_perfect')
 	P_pos = P_ref.get_positions()
 	P_ucell = P_ref.get_cell()
@@ -148,6 +154,80 @@ def draw_vectors():
 	ax[1].set_title("CONTCAR")	
 	plt.show()
 
+# FOR BCC STRUCTURE ONLY
+def Vitek_map(P_atoms): 
+	alat = 3.38 # Angstrom
+	bz = alat/2 * np.sqrt(3)
+	# Half distance between 1st and 2nd n.n.
+	Rcut2 = ( 1/2 * alat * (np.sqrt(6)/3 + np.sqrt(2)) )**2
+	tmp = []
+	P_x = []; P_y = []; P_z = []; P_gradx = []; P_grady = []; P_gradz = []; 
+	
+	disp_file = open('displacement.yaml', 'r')
+	disp_file.readline().strip("\n").split() # first line comment
+	disp_file.readline().strip("\n").split() # 2nd line comment
+	for j in range(P_atoms):
+		tmp.append( disp_file.readline().strip("\n").split() )
+	disp_file.close()
+
+	for i in range(0,P_atoms,1):
+		P_x.append(tmp[i][1] ); 
+		P_y.append(tmp[i][2] )
+		P_z.append(tmp[i][3] )
+		P_gradx.append(tmp[i][4] )
+		P_grady.append(tmp[i][5] )
+		P_gradz.append(tmp[i][6] )
+	P_x = np.array(P_x, dtype=np.float64)	
+	P_y = np.array(P_y, dtype=np.float64)	
+	P_z = np.array(P_z, dtype=np.float64)	
+	P_gradx = np.array(P_gradx, dtype=np.float64)	
+	P_grady = np.array(P_grady, dtype=np.float64)	
+	P_gradz = np.array(P_gradz, dtype=np.float64)	
+	
+	# Dimension of the simulation box
+	x0 = min(P_x)
+	x1 = max(P_x)	
+	y0 = min(P_y)
+	y1 = max(P_y)
+	x_diff = x1-x0
+	y_diff = y1-y0	
+	
+	### Periodic boundary condition along Z
+	if (Per_Z):
+		for i in range (P_atoms):
+			P_z[i] = P_z[i]  - math.floor( P_z[i] /bz )*bz
+
+
+  ### ============== File containing points of the different planes ==================
+	points = open("points.yaml","w")
+
+	z0 = min(P_z) + bz/6.
+	
+	### Atom positions corresponding to 1st (111) plane
+	### For any layers number of layers in the Z direction the following definition
+	### could be changed. FOr example in case of HEAs where the Z direction is twice
+	### the <111>.
+	for i in range (P_atoms):
+		if ( 3.0*np.mod(P_z[i]-z0, bz) < bz ):
+			points.write('{:14.6f} {:14.6f} {:14.6f}\n'.format( P_x[i], P_y[i], P_z[i] ) )
+	points.write("\n")
+
+  ### Atom positions corresponding to 2nd (111) plane
+	for i in range (P_atoms):
+		if ( (3.0*np.mod(P_z[i]-z0,bz) >= bz) and (3.0*np.mod(P_z[i]-z0,bz) < 2.0*bz) ):
+			points.write('{:14.6f} {:14.6f} {:14.6f}\n'.format( P_x[i], P_y[i], P_z[i] ) )
+	points.write("\n")
+	
+	### Atom positions corresponding to 3rd (111) plane
+	for i in range (P_atoms):
+		if (3.0*np.mod(P_z[i]-z0,bz) >= 2.0*bz):
+			points.write('{:14.6f} {:14.6f} {:14.6f}\n'.format( P_x[i], P_y[i], P_z[i] ) )
+	
+	points.close()
+	
+
+	
+	
 #---------------------------------- MAIN ENGINE ------------------------------------
 
 if __name__ == "__main__":
@@ -169,8 +249,7 @@ if __name__ == "__main__":
 		exit("Coordinates types are not equal")
 
 	Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3)
-
-	draw_vectors()
+	Vitek_map(P_atoms)
 	
 	
 	
