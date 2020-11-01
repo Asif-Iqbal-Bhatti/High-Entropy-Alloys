@@ -15,7 +15,7 @@ using namespace std;
 ### AUTHOR: Asif Iqbal Bhatti
 ### DATE : 01/11/2020
 ### USAGE: icpc/icc/g++ defor.cpp (Intel/gcc compiler)
-### PURPOSE: Reads only a POSCAR (VASP) file.
+### PURPOSE: Reads only a POSCAR (VASP5) file.
 ###****************************END OF DOCUMENTATION****************************
 */
 template <class T>
@@ -34,10 +34,11 @@ int main()
 	float latvec[4][4] = {}, xx;
 	int loop = 0, loop2;
 	int p = 0;
-	
+
 	cout << "__|  Enter the POSCAR filename : ";
-	getline(cin, filename);
-	indata.open(filename.c_str(), ios::in);
+	filename = "POSCAR_perfect";
+	//getline(cin, filename);
+	indata.open(filename, ios::in);
 	
 	if (indata.is_open())
 		{
@@ -45,7 +46,7 @@ int main()
 			{
 			getline (indata,line);
 	//		cout << line <<  endl;
-			array[loop]=line;
+			array[loop] = line;
 			loop++;
 			}
 			cout <<"# of lines:   " << loop << endl;
@@ -56,7 +57,7 @@ int main()
 	cout << array[0] <<endl;
 	cout << array[1] <<endl;
 	
-	for (loop2=2; loop2<5;loop2++)	
+	for (loop2=2; loop2<5; loop2++)	
 	{
 		int i = loop2 - 1, j = 1;
 		stringstream iss(array[loop2]);
@@ -68,8 +69,8 @@ int main()
 			if(from_string<float>(xx, std::string(buf), std::dec))		
 			{
 				latvec[i][j] = xx;
-				printf("%16.12f\t", latvec[i][j]* ::atof(array[1].c_str()));
-	// 			cout << i << "\t" << j << endl;
+	//			printf("%16.12f\t", latvec[i][j]* ::atof(array[1].c_str()));
+	  			cout << latvec[i][j] << "\t\t";
 				j++;
 			}
 		}	
@@ -79,9 +80,9 @@ int main()
 	cout << array[6] <<endl;
 	cout << array[7] <<endl;
 	
-	for (loop2=8; loop2 < loop ;loop2++)
+	for (loop2=8; loop2 < loop; loop2++)
 		{
-		cout << array[loop2] <<endl;
+		cout << array[loop2] << endl;
 		}
 	return 0;
 }
