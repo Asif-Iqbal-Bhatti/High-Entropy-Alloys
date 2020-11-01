@@ -4,7 +4,7 @@
 # USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
 # Author :: Asif Iqbal
 # DATED  :: 01/11/2020
-# NB     :: POSCAR should be in Cartesian coordinates.
+# NB     :: POSCAR should be in Cartesian/Direct coordinates.
 # Calculate the coordination around the dislocation line and
 # count the number and type of atoms within the cutoff radius.
 # Two geometries are implemented: Spherical and Cylindrical.
@@ -32,7 +32,7 @@ def read_POSCAR():
 	for ai in P1: P_LV1.append(float(ai)); 
 	for bi in P2: P_LV2.append(float(bi));
 	for ci in P3: P_LV3.append(float(ci));
-	elementtype= file.readline(); #print ("{}".format(elementtype.split() ))
+	elementtype= file.readline(); #print ("{}".format( elementtype ))
 	atomtypes  = file.readline(); #print ("{}".format(atomtypes.split() ))
 	Coordtype  = file.readline().split()
 	nat = [int(i) for i in atomtypes.split()]
@@ -46,9 +46,8 @@ def read_POSCAR():
 			Sp = np.dot(Mp, Dp);	
 			pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
 		else:
-			pos = pos + [coord]
+			pos = pos + [coord]	
 	file.close() 
-
 	#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
 	#for j in range( len( elementtype.split() )):
 	#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
@@ -116,7 +115,7 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 					cartesian_basis = np.inner(Latvect.T, np.array( [i,j,k] ) )				
 					mag_atoms_pos.append( cartesian_basis + l[0:3] ) 	
 					atm_typ.append( l[3:4] )	
-				six.append(elementtype)
+				six.append(elementtype )
 				sev.append(atomtypes)			
 
 	for i in range(-int(Nx/2),np.mod(Nx,2),1):   
@@ -172,7 +171,7 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 				six.append(elementtype)
 				sev.append(atomtypes)			
 
-#----------------------------WRITING TO A FILE-----------------------
+	###	WRITING TO A FILE 
 	Nx,Ny,Nz = 1,1,1
 	ff = open("POSCAR_222", 'w')
 	ff.write("POSCAR_{}x{}x{}\n".format(Nx,Ny,Nz))
@@ -197,7 +196,7 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
 	cnt = 0; bar_graph = []; 	index = [0, 18, 162, 194, 20, 56, 216]
 
-	for q in range(1): # centering the atoms in the Original supercell
+	for q in range(n_atoms): # centering the atoms in the Original supercell
 		for x in range(q, len(pos), 1): # q > x
 			i = float(pos[x][0]) - float(pos[q][0]) 
 			j = float(pos[x][1]) - float(pos[q][1]) 
