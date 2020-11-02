@@ -22,7 +22,7 @@ from termcolor import colored
 r0 = int(sys.argv[1]); rcutoff = float(sys.argv[2]);
 
 def read_POSCAR():
-	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0; dict = {}; g = 0
+	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0;
 	file = open('POSCAR_perfect','r')
 	firstline  = file.readline() # IGNORE first line comment
 	alat       = float( file.readline() )# scale
@@ -211,7 +211,7 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 	.format( atm_typ[r0][0], r0, cnt, rcutoff ) )
 	element_counts = Counter(bar_graph); print ( element_counts )
 
-	# Calculating the probability of pairs within a cutoff radius
+	# Calculating the probability of pairs within a cutoff radius & summing over all the atoms
 	for k,v in element_counts.items():
 		print("P({}-{}) pair -> {:6.5f}".format(atm_typ[r0][0],k,v/(1*sum(element_counts.values() ) ) ) )	
 	return element_counts, bar_graph
@@ -264,11 +264,18 @@ def plot_bar_from_counter(counter, bar_graph, ax=None):
 if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_POSCAR();
 	# B = a<111>/2 which is length along Z=<111>
-	Burgers = float(Latvec3[2]); 	alat = ( (1/1.5) * Burgers ) / np.sqrt(3)
-	
+	Burgers = float(Latvec3[2]); 	
+	alat = ( (1/1.5) * Burgers ) / np.sqrt(3)
+	EA = [];
 	print(colored("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> <sys.argv[2], radius> ", 'red'))
-	print(colored("alat={:5.4f}, atoms={}".format(alat, n_atoms), 'yellow'))
-	print(list( zip(elementtype.split(),atomtypes.split() )) )
+	print("alat={:5.4f}, atoms={}".format(alat, n_atoms))
+	
+	for j in range( len( elementtype.split() )):
+		EA.append( elementtype.split()[j]+atomtypes.split()[j] )
+	EA = ''.join(EA)	
+	subscript = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+	print(EA.translate(subscript))
+	
 	print("{:-^50}".format("*"))
 	print("{:20.5s} {:20.12s} {:10.12s}".format("atom#", "position", "atom type"))
 	print("{:-^50}".format("*"))
