@@ -171,7 +171,7 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 				six.append(elementtype)
 				sev.append(atomtypes)			
 
-	###	WRITING TO A FILE 
+	###	WRITING TO A FILE for DEBUGGING ONLY
 	Nx,Ny,Nz = 1,1,1
 	ff = open("POSCAR_222", 'w')
 	ff.write("POSCAR_{}x{}x{}\n".format(Nx,Ny,Nz))
@@ -193,27 +193,37 @@ def replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3):
 
 def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 	# First select the atom around which to measure the coordination.
-	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
-	cnt = 0; bar_graph = []; 	index = [0, 18, 162, 194, 20, 56, 216]
+	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; 
+	# (r-r0)**2 < R**2
+	cnt = 0; bar_graph = []; t = 0; 
 
-	for q in range(n_atoms): # centering the atoms in the Original supercell
-		for x in range(q, len(pos), 1): # q > x
-			i = float(pos[x][0]) - float(pos[q][0]) 
-			j = float(pos[x][1]) - float(pos[q][1]) 
-			k = float(pos[x][2]) - float(pos[q][2]) 
-			if ( ( i*i + j*j + k*k ) <= rcutoff * rcutoff ): # FILTER
-				if ( x != q ): # NOTE: an atom is *never* counted as its own neighbor.
-					cnt +=1; bar_graph.append( atm_typ[np.mod(x,n_atoms)][0] ); 
-					#print("{:3d} {:4d} {} {}".format( cnt, np.mod(x,n_atoms), pos[x][:], atm_typ[x][0] ));
+	#q = r0
+	# centering the atom in the Original supercell
+	for q in range(n_atoms): 
+		#if (atm_typ[np.mod(q,n_atoms)][0] == 0 ): # FILTERING only Nb !!!
+			for x in range(0, len(pos), 1): # q > x
+				i = float(pos[x][0]) - float(pos[q][0]) 
+				j = float(pos[x][1]) - float(pos[q][1]) 
+				k = float(pos[x][2]) - float(pos[q][2]) 
+				if ( ( i*i + j*j + k*k ) <= rcutoff * rcutoff ): # FILTER !!!
+					if ( x != q ): # NOTE: an atom is *never* counted as its own neighbor
+						cnt +=1; 
+						bar_graph.append( atm_typ[np.mod(x,n_atoms)][0] ); 
+						# TURN this ON if atom positions are required
+						#print("{:3d} {:4d} {} {}".format( cnt, np.mod(x,n_atoms), pos[x][:], atm_typ[x][0] ));
 
 	print("{:_^50}".format("*"))	
-	print("Coordination of Atom r0=[{},{}] is {} within {} radius" \
-	.format( atm_typ[r0][0], r0, cnt, rcutoff ) )
-	element_counts = Counter(bar_graph); print ( element_counts )
+	print("Neighbors around r0=[{},{}] are {} within {} radius (n=1)". \
+	format( atm_typ[r0][0], r0, cnt, rcutoff ) );
+	element_counts = Counter(bar_graph); 
+	print ( element_counts.items() );
 
 	# Calculating the probability of pairs within a cutoff radius & summing over all the atoms
-	for k,v in element_counts.items():
-		print("P({}-{}) pair -> {:6.5f}".format(atm_typ[r0][0],k,v/(1*sum(element_counts.values() ) ) ) )	
+	for k, v in element_counts.items():
+		p = v/(1*sum(element_counts.values()));
+		t = p + t; # Total probability should equal to 1
+		print("P({}-{}) pair -> {:6.5f}({:6.5f})".format(atm_typ[r0][0], k, p, t ) )	
+
 	return element_counts, bar_graph
 	
 def coordination_analysis_Cylindrical_cell(n_atoms, pos):
@@ -224,6 +234,7 @@ def coordination_analysis_Cylindrical_cell(n_atoms, pos):
 	# the index of the site. 
 	s1 = 69; s2 = 153; s3 = 148
 	# To find the centroid of the triangle geometry around the screw dislocation line	
+	# bounded by s1, s2, and s3 atoms.
 	A = ( float(pos[s1][0]), float(pos[s1][1]), float(pos[s1][2]) )
 	B = ( float(pos[s2][0]), float(pos[s2][1]), float(pos[s2][2]) )
 	C = ( float(pos[s3][0]), float(pos[s3][1]), float(pos[s3][2]) ) 
@@ -263,22 +274,23 @@ def plot_bar_from_counter(counter, bar_graph, ax=None):
 #---------------------MAIN ENGINE--------------------------
 if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_POSCAR();
+	
 	# B = a<111>/2 which is length along Z=<111>
 	Burgers = float(Latvec3[2]); 	
-	alat = ( (1/1.5) * Burgers ) / np.sqrt(3)
+	alat = ( (1) * Burgers ) / np.sqrt(3)
 	EA = [];
-	print(colored("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> <sys.argv[2], radius> ", 'red'))
-	print("alat={:5.4f}, atoms={}".format(alat, n_atoms))
 	
 	for j in range( len( elementtype.split() )):
 		EA.append( elementtype.split()[j]+atomtypes.split()[j] )
 	EA = ''.join(EA)	
-	subscript = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-	print(EA.translate(subscript))
 	
-	print("{:-^50}".format("*"))
+	subscript = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+	print(colored("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> <sys.argv[2], radius> ", 'red'))
+	print("alat={:5.4f}, atoms={}, {}".format(alat, n_atoms, EA.translate(subscript)))
+	
+	print("{:_^50}".format("*"))
 	print("{:20.5s} {:20.12s} {:10.12s}".format("atom#", "position", "atom type"))
-	print("{:-^50}".format("*"))
+	print("{:_^50}".format("*"))
 	#element_counts, bar_graph = coordination_analysis_single_supercell(n_atoms, pos)
 	
 	''' Uncomment these two lines to turn on the coordination with replicate cells '''
