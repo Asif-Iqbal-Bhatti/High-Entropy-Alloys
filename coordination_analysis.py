@@ -17,45 +17,52 @@ from scipy import stats
 from matplotlib import pyplot as plt
 from collections import Counter
 from termcolor import colored
+from pathlib import Path
 
 # Site index and cutoff radius
-r0 = int(sys.argv[1]); rcutoff = float(sys.argv[2]);
+r0 = int(sys.argv[1]); 
+rcutoff = float(sys.argv[2]);
 
 def read_POSCAR():
 	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0;
-	file = open('POSCAR_perfect','r')
-	firstline  = file.readline() # IGNORE first line comment
-	alat       = float( file.readline() )# scale
-	P1    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
-	P2    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
-	P3    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec3[0]),float(Latvec3[1]),float(Latvec3[2]))) 
-	for ai in P1: P_LV1.append(float(ai)); 
-	for bi in P2: P_LV2.append(float(bi));
-	for ci in P3: P_LV3.append(float(ci));
-	elementtype= file.readline(); #print ("{}".format( elementtype ))
-	atomtypes  = file.readline(); #print ("{}".format(atomtypes.split() ))
-	Coordtype  = file.readline().split()
-	nat = [int(i) for i in atomtypes.split()]
-	for i in nat: sum = sum + i; n_atoms = sum			
-	Mp = np.transpose( [P_LV1,P_LV2,P_LV3] )
-	for x in range(int(n_atoms)):	
-		coord = file.readline().split()
-		if (Coordtype[0] == "Direct" or Coordtype[0] == "direct"):
-			Xp = float(coord[0]); Yp = float(coord[1]); Zp = float(coord[2])
-			Dp = [Xp, Yp, Zp];
-			Sp = np.dot(Mp, Dp);	
-			pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
-		else:
-			pos = pos + [coord]	
-	file.close() 
-	#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
-	#for j in range( len( elementtype.split() )):
-	#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
-	#for l in dict:
-	#	for k in range( int(dict[l]) ):
-	#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
-	#		print( l, pos[g][:] )
-	#		g +=1
+	if Path('POSCAR_perfect').is_file():
+		print ("File exist")
+		file = open('POSCAR_perfect','r')
+		firstline  = file.readline() # IGNORE first line comment
+		alat       = float( file.readline() )# scale
+		P1    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
+		P2    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
+		P3    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec3[0]),float(Latvec3[1]),float(Latvec3[2]))) 
+		for ai in P1: P_LV1.append(float(ai)); 
+		for bi in P2: P_LV2.append(float(bi));
+		for ci in P3: P_LV3.append(float(ci));
+		elementtype= file.readline(); #print ("{}".format( elementtype ))
+		atomtypes  = file.readline(); #print ("{}".format(atomtypes.split() ))
+		Coordtype  = file.readline().split()
+		nat = [int(i) for i in atomtypes.split()]
+		for i in nat: sum = sum + i; n_atoms = sum			
+		Mp = np.transpose( [P_LV1,P_LV2,P_LV3] )
+		for x in range(int(n_atoms)):	
+			coord = file.readline().split()
+			# SWITCHING IF "DIRECT" COORDINATED IS DETECTED
+			if (Coordtype[0] == "Direct" or Coordtype[0] == "direct"):
+				Xp = float(coord[0]); Yp = float(coord[1]); Zp = float(coord[2])
+				Dp = [Xp, Yp, Zp];
+				Sp = np.dot(Mp, Dp);	
+				pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
+			else:
+				pos = pos + [coord]	
+		file.close() 
+		#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
+		#for j in range( len( elementtype.split() )):
+		#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
+		#for l in dict:
+		#	for k in range( int(dict[l]) ):
+		#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
+		#		print( l, pos[g][:] )
+		#		g +=1
+	else:
+		print ("File not exist")
 	return n_atoms,pos,firstline,alat,P_LV1,P_LV2,P_LV3,elementtype,atomtypes,Coordtype
 
 # THIS function is redundant
@@ -199,7 +206,7 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 
 	#q = r0
 	# centering the atom in the Original supercell
-	for q in range(n_atoms): 
+	for q in range(1): 
 		#if (atm_typ[np.mod(q,n_atoms)][0] == 0 ): # FILTERING only Nb !!!
 			for x in range(0, len(pos), 1): # q > x
 				i = float(pos[x][0]) - float(pos[q][0]) 
