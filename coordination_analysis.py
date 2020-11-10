@@ -3,7 +3,7 @@
 ############################################################################
 # USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
 # Author :: Asif Iqbal
-# DATED  :: 01/11/2020
+# DATED  :: 10/11/2020
 # NB     :: POSCAR should be in Cartesian/Direct coordinates.
 # Calculate the coordination around the dislocation line and
 # count the number and type of atoms within the cutoff radius.
@@ -26,7 +26,6 @@ rcutoff = float(sys.argv[2]);
 def read_POSCAR():
 	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0;
 	if Path('POSCAR_perfect').is_file():
-		print ("File exist")
 		file = open('POSCAR_perfect','r')
 		firstline  = file.readline() # IGNORE first line comment
 		alat       = float( file.readline() )# scale
@@ -44,7 +43,7 @@ def read_POSCAR():
 		Mp = np.transpose( [P_LV1,P_LV2,P_LV3] )
 		for x in range(int(n_atoms)):	
 			coord = file.readline().split()
-			# SWITCHING IF "DIRECT" COORDINATED IS DETECTED
+			# SWITCHING IF "DIRECT" COORDINATE IS DETECTED
 			if (Coordtype[0] == "Direct" or Coordtype[0] == "direct"):
 				Xp = float(coord[0]); Yp = float(coord[1]); Zp = float(coord[2])
 				Dp = [Xp, Yp, Zp];
@@ -206,7 +205,7 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 
 	#q = r0
 	# centering the atom in the Original supercell
-	for q in range(1): 
+	for q in range(n_atoms): 
 		#if (atm_typ[np.mod(q,n_atoms)][0] == 0 ): # FILTERING only Nb !!!
 			for x in range(0, len(pos), 1): # q > x
 				i = float(pos[x][0]) - float(pos[q][0]) 
@@ -236,10 +235,11 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 def coordination_analysis_Cylindrical_cell(n_atoms, pos):
 	# First construct the cylinder around the dislocation line
 	# I've used (x-x0)**2 + (y-y0)**2 < R**2; theta0 = arctan(y/x); z=z
-	cnt = 0;  bar_graph = [];	
+	cnt = 0;  bar_graph = [];	gg = [];
 	# Atom # can be picked by visually looking at the supercell and noticing
 	# the index of the site. 
 	s1 = 69; s2 = 153; s3 = 148
+	
 	# To find the centroid of the triangle geometry around the screw dislocation line	
 	# bounded by s1, s2, and s3 atoms.
 	A = ( float(pos[s1][0]), float(pos[s1][1]), float(pos[s1][2]) )
@@ -301,14 +301,14 @@ if __name__ == "__main__":
 	#element_counts, bar_graph = coordination_analysis_single_supercell(n_atoms, pos)
 	
 	''' Uncomment these two lines to turn on the coordination with replicate cells '''
-	mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
-	element_counts, bar_graph = coordination_analysis_spherical_shell(n_atoms, mag_atoms_pos, atm_typ)
+	#mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
+	#element_counts, bar_graph = coordination_analysis_spherical_shell(n_atoms, mag_atoms_pos, atm_typ)
 	print("{:-^50}".format("*"))	
 
 	''' Uncomment this line to turn on the Cylindrical coordination '''
-	#element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
+	element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
 	
 	''' For plotting turn this on '''
-	plot_bar_from_counter(element_counts, bar_graph)
+	#plot_bar_from_counter(element_counts, bar_graph)
 	
 	
