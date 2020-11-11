@@ -4,7 +4,8 @@
 # USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
 # Author :: Asif Iqbal
 # DATED  :: 10/11/2020
-# NB     :: POSCAR should be in Cartesian/Direct coordinates.
+# NB     :: POSCAR can be in Cartesian/Direct coordinates.
+# Remember the counting starts from Zero in Ovito and python.
 # Calculate the coordination around the dislocation line and
 # count the number and type of atoms within the cutoff radius.
 # Two geometries are implemented: Spherical and Cylindrical.
@@ -20,8 +21,7 @@ from termcolor import colored
 from pathlib import Path
 
 # Site index and cutoff radius
-r0 = int(sys.argv[1]); 
-rcutoff = float(sys.argv[2]);
+rcutoff = float(sys.argv[1]);
 
 def read_POSCAR():
 	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0;
@@ -203,7 +203,7 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 	# (r-r0)**2 < R**2
 	cnt = 0; bar_graph = []; t = 0; 
 
-	#q = r0
+	r0 = 213
 	# centering the atom in the Original supercell
 	for q in range(n_atoms): 
 		#if (atm_typ[np.mod(q,n_atoms)][0] == 0 ): # FILTERING only Nb !!!
@@ -235,11 +235,22 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 def coordination_analysis_Cylindrical_cell(n_atoms, pos):
 	# First construct the cylinder around the dislocation line
 	# I've used (x-x0)**2 + (y-y0)**2 < R**2; theta0 = arctan(y/x); z=z
-	cnt = 0;  bar_graph = [];	gg = [];
+	cnt = 0;  bar_graph = [];	ggZ = [];
+	
 	# Atom # can be picked by visually looking at the supercell and noticing
 	# the index of the site. 
-	s1 = 69; s2 = 153; s3 = 148
+	s1 = 72; s2 = 63; s3 = 269
+
+	### Atom positions corresponding to 3rd (111) plane
+	bz = alat/2 * np.sqrt(3)
+	for i in range(n_atoms):
+		ggZ.append( pos[i][2]  )
 	
+	### This code selects the atoms in the Z Layer
+	#for counter, value in enumerate(ggZ):
+	#	if ( value > 2.8 ):
+	#		print('{} {:14.6f} {:14.6f} {:14.6f}'.format(counter, pos[counter][0], pos[counter][1], pos[counter][2] ) )
+		
 	# To find the centroid of the triangle geometry around the screw dislocation line	
 	# bounded by s1, s2, and s3 atoms.
 	A = ( float(pos[s1][0]), float(pos[s1][1]), float(pos[s1][2]) )
@@ -251,18 +262,20 @@ def coordination_analysis_Cylindrical_cell(n_atoms, pos):
 	
 	r0 = np.sqrt( x0*x0 + y0*y0 )
 	theta = math.degrees( np.arctan(y0/x0) )
-	
-	print("r0,theta=({:5.5f},{:5.5f})".format( r0, theta ) )
-	print("Centroid=({:5.5f},{:5.5f},{:5.5f})".format(x0,y0,z0))
+	#print("r0,theta=({:5.5f},{:5.5f})".format( r0, theta ) )
+	#print("Centroid=({:5.5f},{:5.5f},{:5.5f})".format(x0,y0,z0))
 
 	for x in range(0, len(pos), 1):
 		i = float(pos[x][0]) - x0 
 		j = float(pos[x][1]) - y0 
 		if ( ( np.sqrt(i*i + j*j)  < rcutoff )): # FILTER
-			cnt +=1; bar_graph.append( pos[x][3] )	
-			print ( "{:4d} {} ".format( x, pos[x][:] ) )
-	print ("Coordination # {}, # of atoms in the supercell, {}".format( cnt, len(pos)) )
+			cnt +=1; 
+			bar_graph.append( pos[x][3] )	
+			print ( "{:4d} {:9.6f} {:9.6f} {:9.6f} {:9.6s} ".format(x,pos[x][0],pos[x][1],pos[x][2],pos[x][3] ) )
+	print ("# of atoms in N shell: {}".format( cnt ) )
 	element_counts = Counter(bar_graph)
+	
+	print (element_counts)
 	return element_counts, bar_graph
 	
 def plot_bar_from_counter(counter, bar_graph, ax=None):
@@ -283,8 +296,8 @@ if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_POSCAR();
 	
 	# B = a<111>/2 which is length along Z=<111>
-	Burgers = float(Latvec3[2]); 	
-	alat = ( (1) * Burgers ) / np.sqrt(3)
+	BurgZ = float(Latvec3[2]); 	
+	alat = ( (1) * BurgZ ) / np.sqrt(3)
 	EA = [];
 	
 	for j in range( len( elementtype.split() )):
@@ -293,7 +306,8 @@ if __name__ == "__main__":
 	
 	subscript = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 	print(colored("USAGE :: python3 sys.argv[0] <sys.argv[1], site_index> <sys.argv[2], radius> ", 'red'))
-	print("alat={:5.4f}, atoms={}, {}".format(alat, n_atoms, EA.translate(subscript)))
+	print ("Atom types are not appended in the last column of POSCAR file")
+	print("alat={:5.4f}, #atoms={}, {}".format(alat, n_atoms, EA.translate(subscript)))
 	
 	print("{:_^50}".format("*"))
 	print("{:20.5s} {:20.12s} {:10.12s}".format("atom#", "position", "atom type"))
