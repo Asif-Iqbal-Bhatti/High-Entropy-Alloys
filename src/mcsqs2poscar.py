@@ -2,10 +2,10 @@
 
 #---------------------------------------------------------------------------------
 ''' 
-# AUTHOR::: Asif Iqbal
-# DATED ::: 28/10/2020
-# GITHUB::: @asif_em
-# USAGE		:: python sys.argv[0] bestsqs.out <c/d> 
+# AUTHOR :: Asif Iqbal
+# DATED  :: 28/10/2020
+# GITHUB :: @asif_em
+# USAGE	 :: python3 sys.argv[0] bestsqs.out <c/d> 
 # This script reads bestsqs.out generated from ATAT mcsqs code.
 # Please visit https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 '''
