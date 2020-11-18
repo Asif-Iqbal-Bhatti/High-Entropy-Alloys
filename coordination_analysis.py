@@ -201,12 +201,14 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 	# First select the atom around which to measure the coordination.
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; 
 	# (r-r0)**2 < R**2
-	cnt = 0; bar_graph = []; t = 0; 
-
+	cnt = 0; bar_graph = []; t = 0; writ_graph = []
+	hh = open("coord.dat", "w")
+	
 	r0 = 213
 	# centering the atom in the Original supercell
 	for q in range(n_atoms): 
-		#if (atm_typ[np.mod(q,n_atoms)][0] == 0 ): # FILTERING only Nb !!!
+		#if (atm_typ[np.mod(q,n_atoms)][0] == "Hf" ): # FILTERING only Nb !!!
+			hh.write("{:3d} {}\t".format(q, atm_typ[q][0] ))
 			for x in range(0, len(pos), 1): # q > x
 				i = float(pos[x][0]) - float(pos[q][0]) 
 				j = float(pos[x][1]) - float(pos[q][1]) 
@@ -215,9 +217,13 @@ def coordination_analysis_spherical_shell(n_atoms, pos, atm_typ):
 					if ( x != q ): # NOTE: an atom is *never* counted as its own neighbor
 						cnt +=1; 
 						bar_graph.append( atm_typ[np.mod(x,n_atoms)][0] ); 
+						writ_graph.append( atm_typ[np.mod(x,n_atoms)][0] );
 						# TURN this ON if atom positions are required
-						#print("{:3d} {:4d} {} {}".format( cnt, np.mod(x,n_atoms), pos[x][:], atm_typ[x][0] ));
-
+						#print("{:3d} {:4d} {} {}".format( cnt, np.mod(x,n_atoms), pos[x][:], atm_typ[x][0] ))
+			elem_counts = Counter( writ_graph );	
+			hh.write("{}\n".format( sorted(elem_counts.items()) ) )
+			writ_graph = []
+	
 	print("{:_^50}".format("*"))	
 	print("Neighbors around r0=[{},{}] are {} within {} radius (n=1)". \
 	format( atm_typ[r0][0], r0, cnt, rcutoff ) );
@@ -246,7 +252,7 @@ def coordination_analysis_Cylindrical_cell(n_atoms, pos):
 	for i in range(n_atoms):
 		ggZ.append( pos[i][2]  )
 	
-	### This code selects the atoms in the Z Layer
+	### This code selects the atoms in the 3rd Layer
 	#for counter, value in enumerate(ggZ):
 	#	if ( value > 2.8 ):
 	#		print('{} {:14.6f} {:14.6f} {:14.6f}'.format(counter, pos[counter][0], pos[counter][1], pos[counter][2] ) )
@@ -289,7 +295,7 @@ def plot_bar_from_counter(counter, bar_graph, ax=None):
 	plt.rcParams.update({'figure.figsize':(7,5), 'figure.dpi':300})
 	plt.gca().set(title='Frequency Histogram', ylabel='Frequency');
 	#plt.savefig('Coordination_barPlot.eps', format='eps', dpi=300)
-	#plt.show()
+	plt.show()
 
 #---------------------MAIN ENGINE--------------------------
 if __name__ == "__main__":
@@ -309,18 +315,16 @@ if __name__ == "__main__":
 	print ("Atom types are not appended in the last column of POSCAR file")
 	print("alat={:5.4f}, #atoms={}, {}".format(alat, n_atoms, EA.translate(subscript)))
 	
-	print("{:_^50}".format("*"))
 	print("{:20.5s} {:20.12s} {:10.12s}".format("atom#", "position", "atom type"))
-	print("{:_^50}".format("*"))
 	#element_counts, bar_graph = coordination_analysis_single_supercell(n_atoms, pos)
 	
 	''' Uncomment these two lines to turn on the coordination with replicate cells '''
-	#mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
-	#element_counts, bar_graph = coordination_analysis_spherical_shell(n_atoms, mag_atoms_pos, atm_typ)
+	mag_atoms_pos, atm_typ = replicate_cell(pos,n_atoms,Latvec1,Latvec2,Latvec3)	
+	element_counts, bar_graph = coordination_analysis_spherical_shell(n_atoms, mag_atoms_pos, atm_typ)
 	print("{:-^50}".format("*"))	
 
 	''' Uncomment this line to turn on the Cylindrical coordination '''
-	element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
+	#element_counts, bar_graph = coordination_analysis_Cylindrical_cell(n_atoms, pos)
 	
 	''' For plotting turn this on '''
 	#plot_bar_from_counter(element_counts, bar_graph)
