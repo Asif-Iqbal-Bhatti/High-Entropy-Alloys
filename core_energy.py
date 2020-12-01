@@ -5,7 +5,7 @@
 # USAGE  :: python3 sys.argv[0] 
 # Author :: Asif Iqbal
 # DATED  :: 01/12/2020
-# NB     :: POSCAR can be in Cartesian/Direct coordinates.
+# NB     :: POSCAR should be in Cartesian coordinates.
 # Calculate the core energy of the screw dislocations
 # by sampling different local chemical environment within a supercell
 # by translating the atoms keeping the screw dislocation fixed.
@@ -14,12 +14,8 @@
 
 import numpy as np
 import os, sys, random, subprocess, shutil
-from ase import Atoms
-import ase.io
-from ase.io import write, read
-from ase.io.vasp import write_vasp, read_vasp
 
-def read_poscar():
+def read_POSCAR():
 	pos = []; kk = []; lattice = []; sum = 0; 
 	file = open('POSCAR_perfect','r')
 	firstline  = file.readline() # IGNORE first line comment
@@ -56,7 +52,7 @@ def write_result(i,j,cnt,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atom
 	
 # -------------------------------------- MAIN PROGRAM -------------------------------------- 
 if __name__ == "__main__":
-	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_poscar();
+	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_POSCAR();
 	Ax = float(Latvec1[0]); 
 	Ay = np.linalg.norm(Latvec2[1]); 
 	cnt = 0; cx = 0; cy = 0
@@ -67,9 +63,10 @@ if __name__ == "__main__":
 		for j in np.linspace(0, Ay, 10, endpoint=True):
 			write_result(i,j,cnt,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,pos,n_atoms)
 			L = 'dis_'+'X'+str(cx).zfill(2)+"_"+'Y'+str(cy).zfill(2)+'_'+str(cnt).zfill(2)
-			shutil.rmtree( L , ignore_errors=True) #overwrite a directory
+			shutil.rmtree( L , ignore_errors=True ) #overwrite a directory
 			
 			os.mkdir( L )
+			
 			# copy the files to the directory.
 			subprocess.call(['cp','-r','iniTMP_'+str(cnt).zfill(2), L ], shell = False)
 			subprocess.call(['cp','-r','INCAR', L ], shell = False)
