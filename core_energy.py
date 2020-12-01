@@ -14,15 +14,13 @@
 
 import numpy as np
 import os, sys, random, subprocess, shutil
-import matplotlib as mp
-from ase.constraints import FixAtoms, FixedPlane, FixedLine
 from ase import Atoms
 import ase.io
 from ase.io import write, read
 from ase.io.vasp import write_vasp, read_vasp
 
 def read_poscar():
-	pos = []; kk = []; lattice = []; sum = 0; dict = {}; g = 0
+	pos = []; kk = []; lattice = []; sum = 0; 
 	file = open('POSCAR_perfect','r')
 	firstline  = file.readline() # IGNORE first line comment
 	alat = float( file.readline() )# scale
@@ -34,26 +32,11 @@ def read_poscar():
 	Coordtype  = file.readline().split()
 	if (Coordtype[0] == 'Direct' or Coordtype[0] == 'direct'): exit("First, Convert to Cartesian!")
 	nat = [int(i) for i in atomtypes.split()]
-	for i in nat: sum = sum + i; n_atoms = sum
-	# print ("Number of atoms:", (n_atoms), end = '\n')	
-	# Reading the Atomic positions				
+	for i in nat: sum = sum + i; n_atoms = sum				
 	for x in range(int(n_atoms)):
 		coord = [ float(i) for i in file.readline().split() ]
 		pos = pos + [coord]
 	file.close()
-	#                              !!! This code index the atoms !!!
-	#for index, line in enumerate(pos):
-	#	dict[index] = line
-	#for num, atm_num in dict.items():
-	#	print("{} {}".format(num, atm_num) )
-		#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
-	#for j in range( len( elementtype.split() )):
-	#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
-	#for l in dict:
-	#	for k in range( int(dict[l]) ):
-	#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
-	#		print( l, pos[g][:] )
-	#		g +=1
 	return n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype
 
 def write_result(i,j,cnt,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,pos,n_atoms):
@@ -75,10 +58,10 @@ def write_result(i,j,cnt,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atom
 if __name__ == "__main__":
 	n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype = read_poscar();
 	Ax = float(Latvec1[0]); 
-	Ay = np.linalg.norm(Latvec2[0]); 
+	Ay = np.linalg.norm(Latvec2[1]); 
 	cnt = 0; cx = 0; cy = 0
-	print("SYSTEM detected={}, #_atoms={}".format(elementtype.split(), n_atoms), end='\t\n' )
-	print("Displaced in the X=<112> & Y=<110> direction.")
+	b = 3.40/2 * np.linalg.norm([1,1,1]);
+	print("SYSTEM={}, #_atoms={} b={}".format(elementtype.split(), n_atoms, b), end='\t\n' )
 	
 	for i in np.linspace(0, Ax, 21, endpoint=True):
 		for j in np.linspace(0, Ay, 10, endpoint=True):
@@ -99,13 +82,15 @@ if __name__ == "__main__":
 			os.chdir( L )
 			subprocess.call(['cp','-r','iniTMP_'+str(cnt).zfill(2), 'CONTCAR'], shell = False)
 			subprocess.call(['dislo', 'input_dislo.babel'], shell = False)
-			K = '../disFIN_'+'X'+str(cx).zfill(2)+"_"+'Y'+str(cy).zfill(2)+'_'+str(cnt).zfill(2)
+			K = 'disFIN_'+'X'+str(cx).zfill(2)+"_"+'Y'+str(cy).zfill(2)+'_'+str(cnt).zfill(2)
 			subprocess.call( ['cp','-r', 'POSCAR', K ], shell = False)		
+			subprocess.call( ['cp','-r', K, '../iniTMP_'+str(cnt).zfill(2) ], shell = False)		
 			os.chdir('../')		
 			
+			print ( "Ax,Ay= {:12.6f},{:12.6f} {:3d}".format( i,j, cnt ), end="\n" )
 			cnt += 1
-			cy += 1
-			print ( "Ax,Ay = {:12.6f} {:12.6f} {:3d}".format( i,j, cnt ), end="\n" )
+			cy  += 1
+		cy = 0	# reset counter
 		cx +=1
 	print("DISPLACED FILES HAS BEEN GENERATED in the X=<112>, Y=<110> ... ")
 
