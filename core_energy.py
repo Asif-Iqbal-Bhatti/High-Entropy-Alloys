@@ -4,7 +4,7 @@
 ############################################################################
 # USAGE  :: python3 sys.argv[0] 
 # Author :: Asif Iqbal
-# DATED  :: 01/12/2020
+# DATED  :: 13/12/2020
 # NB     :: POSCAR should be in Cartesian coordinates.
 # Calculate the core energy of the screw dislocations
 # by sampling different local chemical environment within a supercell
@@ -56,11 +56,12 @@ if __name__ == "__main__":
 	Ax = float(Latvec1[0]); 
 	Ay = np.linalg.norm(Latvec2[1]); 
 	cnt = 0; cx = 0; cy = 0
-	b = 3.40/2 * np.linalg.norm([1,1,1]);
-	print("SYSTEM={}, #_atoms={} b={}".format(elementtype.split(), n_atoms, b), end='\t\n' )
+	b = 3.40/2 * np.linalg.norm([1,1,1]); a = 2*b /np.sqrt(3)
+	file = open("FILE_INFO.yaml",'w')
 	
-	for i in np.linspace(0, Ax, 21, endpoint=True):
-		for j in np.linspace(0, Ay, 10, endpoint=True):
+	
+	for i in np.arange(0, Ax, np.sqrt(2/3)*3.40):
+		for j in np.arange(0, Ay, np.sqrt(2/3)*3.40):
 			write_result(i,j,cnt,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,pos,n_atoms)
 			L = 'dis_'+'X'+str(cx).zfill(2)+"_"+'Y'+str(cy).zfill(2)+'_'+str(cnt).zfill(2)
 			shutil.rmtree( L , ignore_errors=True ) #overwrite a directory
@@ -72,11 +73,25 @@ if __name__ == "__main__":
 			subprocess.call(['cp','-r','INCAR', L ], shell = False)
 			subprocess.call(['cp','-r','POTCAR', L ], shell = False)
 			subprocess.call(['cp','-r','KPOINTS', L ], shell = False)
-			subprocess.call(['cp','-r','job.sh', L ], shell = False)
 			subprocess.call(['cp','-r','input_dislo.babel', L ], shell = False)
 			
 			# Enter the directory.		
 			os.chdir( L )
+			
+			job = open("job.sh", 'w')
+			job.write("#!/bin/bash\n")
+			job.write("#SBATCH -J core_{}\n".format(cnt))
+			job.write("#SBATCH -o slurm.out\n")
+			job.write("#SBATCH -e slurm.err\n")
+			job.write("#SBATCH -t 50:40:00\n")
+			job.write("#SBATCH --nodes=6\n")
+			job.write("#SBATCH --ntasks-per-node=40\n")
+			job.write("#SBATCH --partition=COMPUTE-SHORT\n")
+			job.write("module load intel/2018.4\n")
+			job.write("module load intel/2018.4/openmpi/3.1.4\n")
+			job.write("srun --resv-ports --mpi=pmi2 /softs/VASP544-INTEL2018-OMPI3.1.4-TBDYN/vasp.5.4.4/bin/vasp_std\n")
+			job.close()
+			
 			subprocess.call(['cp','-r','iniTMP_'+str(cnt).zfill(2), 'CONTCAR'], shell = False)
 			subprocess.call(['dislo', 'input_dislo.babel'], shell = False)
 			K = 'disFIN_'+'X'+str(cx).zfill(2)+"_"+'Y'+str(cy).zfill(2)+'_'+str(cnt).zfill(2)
@@ -84,14 +99,17 @@ if __name__ == "__main__":
 			subprocess.call( ['cp','-r', K, '../iniTMP_'+str(cnt).zfill(2) ], shell = False)		
 			os.chdir('../')		
 			
-			print ( "Ax,Ay= {:12.6f},{:12.6f} {:3d}".format( i,j, cnt ), end="\n" )
+			file.write ( "Ax, Ay = {:12.6f},{:12.6f} {:3d}\n".format( i,j, cnt ) )
+			
 			cnt += 1
 			cy  += 1
 		cy = 0	# reset counter
 		cx +=1
+		
 	print("DISPLACED FILES HAS BEEN GENERATED in the X=<112>, Y=<110> ... ")
-
-
+	print("SYSTEM={}, #_atoms={} b={}".format(elementtype.split(), n_atoms, b), end='\t\n' )
+	file.close()
+	
 			
 	
 	
