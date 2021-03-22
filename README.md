@@ -21,8 +21,6 @@ Python script to generate BCC/FCC/HCP random structures using SQS technique. Thi
 
 https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html 
 
-https://github.com/dgehringer/sqsgenerator 
-
 https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[4] Code to convert file generated from MCSQS ATAT code to VASP POSCAR file.**
