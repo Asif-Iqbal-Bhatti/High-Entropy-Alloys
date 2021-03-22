@@ -39,8 +39,7 @@ https://github.com/pierrehirel/atomsk/
 it generates POSCAR files and they can be run independently with VASP and after relaxation in the z direction
 the energy can be calulated and GSFE can be plotted against normalized burger vector.
 
-**For Elastic constant**
-http://wolf.ifj.edu.pl/elastic/index.html
+
 
 
 https://shields.io/
