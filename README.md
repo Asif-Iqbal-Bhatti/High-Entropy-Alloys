@@ -4,6 +4,9 @@
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
+**CITATION toward this work should be acknowledged in the publication.**
+**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER**
+
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
 --> b is a burger vector (b = a/2[111])
@@ -29,8 +32,6 @@ https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 
 **[6] https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html**
 
-**CITATION toward this work should be acknowledged in the publication.**
-**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER**
 
 NB:: For generating the structure you will need to install atomsk. The link is:
 https://github.com/pierrehirel/atomsk/ 
