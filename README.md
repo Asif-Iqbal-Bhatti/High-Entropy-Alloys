@@ -4,9 +4,7 @@
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
-!!!**CITATION toward this work should be acknowledged in the publication.**!!!
-
-**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY WHATSOEVER**
+**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!**
 
 **[1] Generate Stacking fault energy & Screw dislocation for bcc crystals**
 
