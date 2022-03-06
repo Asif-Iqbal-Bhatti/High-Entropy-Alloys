@@ -24,6 +24,13 @@ the energy can be calulated and GSFE can be plotted against normalized burger ve
 
 3. Generating Random Structure using SQS technique method: Python script to generate BCC/FCC/HCP random structures. This program is the MODIFICATION of the NANOHUB code.
 
+4. Code to convert file generated from MCSQS ATAT code to VASP POSCAR file
+
+5. Monte Carlo code for generating strucutre with lower Binding energy
+
+6. For Dislocation analysis: https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
+
+
 i.   https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
 
 ii.  https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
@@ -32,11 +39,7 @@ iii. https://aip.scitation.org/doi/10.1063/5.0014094;
 
 iv. https://pyscal.org/en/latest/
 
-4. Code to convert file generated from MCSQS ATAT code to VASP POSCAR file
-
-5. Monte Carlo code for generating strucutre with lower Binding energy
-
-6. For Dislocation analysis: https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
+v. http://emmanuel.clouet.free.fr/presentation.html
 
 
 
