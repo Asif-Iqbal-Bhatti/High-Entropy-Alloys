@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 '''
 ################################################################################
-# USAGE:: Run this script in a directory where SRO simulations are performed
+# USAGE:: Run this script in a directory where SQS simulations are performed
 # 
-# USING pyscal to compute SRO parameters using fontain et al.
+# USAGE:: pyscal to compute SRO parameters using fontain et al.
 # https://pyscal.org/en/latest/_modules/pyscal/core.html#System.calculate_pmsro
 ################################################################################
 '''
