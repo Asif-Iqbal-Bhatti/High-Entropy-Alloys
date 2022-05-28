@@ -4,17 +4,16 @@
 ''' 
 # AUTHOR :: Asif Iqbal
 # DATED  :: 28/10/2020
-# GITHUB :: @asif_em
-# USAGE	 :: python3 sys.argv[0] bestsqs.out <c/d> 
+# GITHUB :: @aib_em
+# USAGE	 :: python sys.argv[0] bestsqs.out <c/d, Cartesian or Direct> 
 # This script reads bestsqs.out generated from ATAT mcsqs code.
-# Please visit https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
+# Visit https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
 '''
 #---------------------------------------------------------------------------------
 
 import numpy as np
 import os, sys
 from numpy import linalg as LA
-from termcolor import colored
 
 def load_bestsqs():
 	coord=[]; pos=[]; elem=[]; elem_O=[]; atm_num=[]; count=0; CX=[]; LV=[]
@@ -26,17 +25,16 @@ def load_bestsqs():
 
 	fdata1 = open(sys.argv[1],'r')
 	#---
-	Cart_Vec1 = fdata1.readline().split(); Cart_VX = [float(i) for i in Cart_Vec1]
-	Cart_Vec2 = fdata1.readline().split(); Cart_VY = [float(i) for i in Cart_Vec2]
-	Cart_Vec3 = fdata1.readline().split(); Cart_VZ = [float(i) for i in Cart_Vec3]
-	Lat_Vec1 	= fdata1.readline().split(); Lat_VX = [float(i) for i in Lat_Vec1]
-	Lat_Vec2 	= fdata1.readline().split(); Lat_VY = [float(i) for i in Lat_Vec2]
-	Lat_Vec3 	= fdata1.readline().split(); Lat_VZ = [float(i) for i in Lat_Vec3]	
-	CX.append(Cart_VX); CX.append(Cart_VY); CX.append(Cart_VZ)
-	LV.append(Lat_VX); LV.append(Lat_VY); LV.append(Lat_VZ)		
-	print ("Cartesian Vector: {}".format(CX))
-	print ("Lattice Vector: {}".format(LV))
+	CX.append( [float(i) for i in fdata1.readline().split()] )
+	CX.append( [float(i) for i in fdata1.readline().split()] )
+	CX.append( [float(i) for i in fdata1.readline().split()] )
+
+	LV.append( [float(i) for i in fdata1.readline().split()] )
+	LV.append( [float(i) for i in fdata1.readline().split()] )
+	LV.append( [float(i) for i in fdata1.readline().split()] )
+	
 	POS_vec = np.dot(CX, LV)
+	print(POS_vec)
 	
 	#--- Sorting coordinates and element types
 	for i in range(atoms):
@@ -61,7 +59,7 @@ def load_bestsqs():
 	dict1 = {a : b for a,b in elem_atom}
 	print ("{}".format( dict1 ) )
 	
-#------------------- Converting bestsqs.out to POSCAR file (VASP5)
+	#------------------- Converting bestsqs.out to POSCAR file (VASP5)
 	fdata2 = open('POSCAR_bestsqs','w')
 	
 	fdata2.write("POSCAR generated from bestsqs\n")
@@ -73,7 +71,7 @@ def load_bestsqs():
 	for i in atm_num: fdata2.write("{:4d}".format(i)); 
 	fdata2.write("\n")	
 
-#------------------------- In Cartesian UNITS ----------------#
+	#------------------------- In Cartesian UNITS ----------------#
 
 	if (sys.argv[2] == 'c' or sys.argv[2] == 'C' or sys.argv[2] == 'Cartesian'):
 		fdata2.write("{:12.9s}\n".format("Cartesian"))
@@ -85,7 +83,7 @@ def load_bestsqs():
 			A = np.dot( pos[i][:], CX )
 			fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( A[0], A[1], A[2] ) )
 		
-#------------------------- In fractional/reduced UNITS ----------------#	
+	#------------------------- In fractional/reduced UNITS ----------------#	
 
 	elif (sys.argv[2] == 'd' or sys.argv[2] == 'D' or sys.argv[2] == 'Direct'):	
 		fdata2.write("{:12.9s}\n".format("Direct"))
@@ -106,7 +104,7 @@ def load_bestsqs():
 			fdata2.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(A,u)/Vx, np.dot(A,v)/Vy, np.dot(A,w)/Vz ) )	
 
 	fdata2.close()
-	print (colored("File has been generated in {}".format(sys.argv[2]), "yellow" ))
+	print (("File has been generated in {} coord".format(sys.argv[2]) ))
 	
 if __name__ == "__main__":
 	load_bestsqs()
