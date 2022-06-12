@@ -2,7 +2,8 @@
 '''
 ################################################################################
 # USAGE:: Run this script in a directory where SQS simulations are performed
-# 
+# @AsifIqbal
+# @AIB_EM
 # USAGE:: pyscal to compute SRO parameters using fontain et al.
 # https://pyscal.org/en/latest/_modules/pyscal/core.html#System.calculate_pmsro
 ################################################################################
@@ -34,18 +35,15 @@ for u in next(os.walk('.'))[1]:
 	top.read_inputfile(hh,format='poscar')
 	#top.find_neighbors(method='cutoff', cutoff=1.2)
 	top.find_neighbors(method='number', nmax=26)	
-	#print("{:6s}  {:10.10s} {:10.10s} {:10.10s}".format( "Pairs", "1st_Shell", "2nd_Shell", "1st+2nd"  ) )
 	for t in range(natm):
 		for j in range(natm):
 			sro = top.calculate_pmsro(reference_type=t+1, compare_type=j+1, average=True, shells=2, delta=True)
 			if (j > t):
-				#print("{}-{} {:9.5f} {:9.5f} {:9.5f}".format( atom_type[t], atom_type[j], sro[0], sro[1], sro[0]+sro[1]  ) )
 				a=a+sro[0]
 				b=b+sro[1]
 				c=c+sro[0]+sro[1]
 				gg[atom_type[t]+'-'+atom_type[j]] = [ round(sro[0],4), round(sro[1],4), sro[0]+sro[1] ]
 			if (j == t):
-				#print("{}-{} {:9.5f} {:9.5f} {:9.5f}".format( atom_type[t], atom_type[j], sro[0], sro[1], sro[0]+sro[1]   ) )
 				a=a+sro[0]
 				b=b+sro[1] 			
 				c=c+sro[0]+sro[1]
