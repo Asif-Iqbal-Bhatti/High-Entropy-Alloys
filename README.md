@@ -1,4 +1,4 @@
-# GS fault energy, Screw dislocations, SRO for 1/2<111>  bcc High Entropy Alloys [#VASP, #ATAT #MCSQS]
+# GSFE, Screw dislocation, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys (#VASP, #ATAT, #MCSQS, #ASE, #Pymatgen, #Python)
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
