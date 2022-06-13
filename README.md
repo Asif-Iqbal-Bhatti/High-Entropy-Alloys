@@ -1,4 +1,4 @@
-# G. Stacking fault energy, Screw dislocations 1/2<111> for bcc High Entropy Alloys [VASP, ATAT MCSQS code]
+# GS fault energy, Screw dislocations, SRO for 1/2<111>  bcc High Entropy Alloys [#VASP, #ATAT #MCSQS]
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
