@@ -9,7 +9,7 @@
 **USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!**
 
 Scripts that are included in this package:
-
+_________________
 1. Generate Stacking fault energy & Screw dislocation for bcc crystals
 
    --> b is a burger vector (b = a/2[111]) and GSFE is calculated as
@@ -30,9 +30,16 @@ the energy can be calulated and GSFE can be plotted against normalized burger ve
 
 5. Monte Carlo code for generating strucutre with lower Binding energy
 
-6. For Dislocation analysis: https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
+6. For Dislocation analysis: 
 
+https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
 
+7. Creation of Screw dislocations
+8. Finding SRO with oyscal code
+9. Find core energy of of screw dislocation 
+
+IMP LINKS::
+___________________________
 i.   https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
 
 ii.  https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
