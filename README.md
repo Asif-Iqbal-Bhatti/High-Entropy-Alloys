@@ -1,8 +1,10 @@
-# GSFE, Screw dislocation, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys (#VASP, #ATAT, #MCSQS, #ASE, #Pymatgen, #Python)
+# GSFE, Screw dislocation, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys 
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+
+#VASP, #ATAT, #MCSQS, #ASE, #Pymatgen, #Python
 
 **USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!**
 
