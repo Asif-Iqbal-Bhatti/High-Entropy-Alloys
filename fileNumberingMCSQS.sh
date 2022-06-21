@@ -1,18 +1,26 @@
 #!/bin/bash
 
-mkdir ./test
+mkdir -p .test
 i=0
+hh=bestcorr
+jj=out
 
-for d in */; 
-do
-	f=${d%/}; ext=${d##*-}
-	for k in $f/mcsqs*.log; 
-	do
-  
-	echo $k
-  cc=`printf "%03d" $i`
-	cp $k .test/mcsqs-$cc.log
-  let i=i+1
+for d in sqs_x_0.20_*; do
+	f=${d%/}; 
+	ext=${d##*-}
+	
+	for k in $f/$hh*.$jj; do
+	
+		echo -ne "$k! \033[0K\r"
+		
+		cc=`printf "%04d" $i`
+		cp $k .test/$hh-$cc.$jj
+		
+		ov=`tail -1 .test/$hh-$cc.$jj | awk -F' ' '{printf $2}'`
+		echo .test/$hh-$cc.$jj, $ov >> objective_Ti0.20.csv
+		
+		let i=i+1
+	
 	
 	done
 done	
