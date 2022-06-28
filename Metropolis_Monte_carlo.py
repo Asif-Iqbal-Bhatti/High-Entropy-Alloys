@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
+'''
 #------------------------------------------------------------------------
-# USAGE  :: python3 monte_carlo_HEA.py 
-# Author :: Asif Iqbal
-# DATED  :: 03/08/2020
-# Metropolis Monte Carlo in a NVT (canonical) ensemble
-# ADAPTED FROM:: https://chryswoods.com/intro_to_mc/part1/metropolis.html
-# This script calculates the energy of the system by swapping the atoms
-# and invoking the MC code to find the lowest structure.
-# --->>> In upper directory, there should be CONTCAR & OUTCAR.
+# USAGE  :: PYTHON3 SRO_vs_ENERGY.py
+# AUTHOR :: @ASIFIQBAL
+# DATED  :: 02/07/2022
+# METROPOLIS MONTE CARLO IN A NVT (CANONICAL) ENSEMBLE
+# ADAPTED FROM:: HTTPS://CHRYSWOODS.COM/INTRO_TO_MC/PART1/METROPOLIS.HTML
+# THIS SCRIPT CALCULATES THE ENERGY OF THE SYSTEM BY SWAPPING THE ATOMS
+# AND INVOKING THE MC CODE TO FIND THE LOWEST STRUCTURE.
 #------------------------------------------------------------------------
+'''
 
 import numpy as np
 import os, sys, random, subprocess, shutil
@@ -16,10 +17,12 @@ import os.path, time
 
 k = 8.617333262145E-5 # Boltzmann constant
 T = 500 # Temperature in Kelvin
-sample = 10 # Number of sample could be # of atoms to swap
+sample = 200 # Number of sample could be # of atoms to swap
 
-if os.path.exists('profile.dat'):
-	os.remove('profile.dat') #this deletes the file
+out_files = ["profile.csv", "accept.dat"];
+for f in out_files: 
+	if os.path.exists(f):
+		os.remove(f) #this deletes the file
 				
 def read_poscar():
 	pos = []; kk = []; lattice = []; sum = 0
@@ -56,11 +59,11 @@ def calculate_energy():
 		word = i.split()
 		if "free  energy   TOTEN  =" in i:
 			ii=lines.index(i)
-	old_energy =  float (lines[ii].split()[4])
+	old_energy =  float(lines[ii].split()[4])
 	return old_energy
 
-def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):	
-	tot_energy = []
+def metropolis_MC(new_energy, old_energy, naccept, nreject):	
+	a_energy = []; r_energy = []
 	accept = False;
 	# Accept if the energy goes down
 	if (new_energy <= old_energy):
@@ -77,99 +80,56 @@ def metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject):
 	if accept:
 		# Accept the move
 		naccept += 1; 
-		print ("{} : {:10.6f}".format("Accept ratio", naccept/sample)  )
-		tot_energy = new_energy
+		#print ("{}: {:10.3f}%".format("Accept ratio", (naccept/sample)*100  )  )
+		a_energy = new_energy
+		yes="Accept"
 	else:
 		# reject the move - restore the old coordinates
 		nreject += 1
-		print ("{} : {:10.6f}".format ( "Reject ratio", nreject/sample)  )
-		new_pos[0] = old_pos[0]
-		new_pos[1] = old_pos[1]
-		new_pos[2] = old_pos[2]
-		tot_energy = old_energy
+		#print ("{}: {:10.3f}%".format ("Reject ratio", (nreject/sample)*100 )  )
+		r_energy = old_energy	
+		yes="Reject"
+	return a_energy, r_energy, naccept, nreject, yes
+
+def write_result(i,new_energy,old_energy,SRO,naccept,nreject,sample,yes):
+	with open('profile.csv', 'a') as fdata3:
+		fdata3.write ("{:3d}, {:9.10s}, {:11.8f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n" \
+		.format(i, 'POS_'+str(i).zfill(3), new_energy, SRO, (naccept/sample)*100, (nreject/sample)*100, yes ) )
+	
+	if (yes=='Accept'):
+		with open('accept.dat', 'a') as fdata4:
+			fdata4.write ("{:9.10s}, {:11.6f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n" \
+			.format('POS_'+str(i).zfill(3), new_energy, SRO, (naccept/sample)*100, (nreject/sample)*100, yes ) )
+			
+#=====================  MAIN PROGRAM
+if __name__ == "__main__":
+	# FIRST OBTAIN THE GROUND/OPTIMIZED ENERGY OF 
+	# THE CURRENT SQS IN AN IDEAL POSITION
+	naccept = 0; nreject = 0; 
+	old_energy = calculate_energy();
+	n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
+	print("Starting simulation energy: {:15.8f}".format(old_energy), end = '\n')
+	print("T={:4f} K Sample={:5d} Atoms={:5d}\n".format(T, sample, n_atoms))
+	
+	with open('profile.csv', 'a') as fdata3:
+		fdata3.write ("{:17s}, {:17s}, {:11.12s}, {:6.6s}, {:6s}, {:8s}\n".format(" ", " ","Ediff", "SRO", "Accept[%]", "Reject[%]" ))
 		
-	return new_pos, tot_energy, naccept, nreject
-
-#------------------------------------MAIN PROGRAM--------------------------
+	for i in range(1, sample):
 	
-# First calculate the ground/optimized energy of the current SQS or SRO structure
-naccept = 0; nreject = 0; 
-old_energy = calculate_energy();
-n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
-print (" __-->__ Initial system Energy:", (old_energy), end = '\n')
-
-for i in range(1, sample):
-	old_pos = pos
-	# Pick a random integer atom 1 (random.randint(a,b)) inclusive. Save the old coordinates
-	rnd_atm1   = random.randint(0, n_atoms-1);
-	#old_coords = ( pos[rnd_atm1][0], pos[rnd_atm1][1], pos[rnd_atm1][2] )
-	#print ("Randomly selected atom", (old_coords), rnd_atm1-1, end = '\n')
-	tmp_1 = pos[rnd_atm1][0]
-	tmp_2 = pos[rnd_atm1][1]
-	tmp_3 = pos[rnd_atm1][2]
-	
-	# Pick a random integer atom 2 (random.randint(a,b)) inclusive. save the old coordinates 
-	rnd_atm2      = random.randint(0, n_atoms-1);
-	#random_coords = ( pos[rnd_atm2][0], pos[rnd_atm2][1], pos[rnd_atm2][2] )
-	#print ("Randomly selected atom", (random_coords), rnd_atm2-1, end = '\n')
-	
-	# Swapping the position of the atoms and writing to a POSCAR file 
-	# and then submitting to VASP to calculate the new energy
-	pos[rnd_atm1][0] = pos[rnd_atm2][0]
-	pos[rnd_atm1][1] = pos[rnd_atm2][1]
-	pos[rnd_atm1][2] = pos[rnd_atm2][2]
-	
-	pos[rnd_atm2][0] = tmp_1
-	pos[rnd_atm2][1] = tmp_2
-	pos[rnd_atm2][2] = tmp_3
-	
-	new_pos = pos
-	print ("{:4s} {:3d} {:4s} {:3d}".format("Swapping atoms",rnd_atm1-1, "and", rnd_atm2-1), end = '\t' )
-	
-	#>>>>>>>>>-------- Writing a POSCAR File for new swapping -----------")
-	fdata2 = open('POSCAR_'+str(i).zfill(3),'w')
-	fdata2.write(firstline)
-	fdata2.write("{:12.6f}\n".format(alat) )
-	fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])) )
-	fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])) )
-	fdata2.write("{:15.12f} {:15.12f} {:15.12f}\n".format( float(Latvec3[0]),float(Latvec3[1]),float(Latvec3[2])) )
-	fdata2.write(elementtype)
-	fdata2.write(atomtypes)
-	fdata2.write("{}\n".format( Coordtype[0] ) )
-	for x in range(int(n_atoms)):
-		fdata2.write("{:20.16f} {:20.16f} {:20.16f}\n".format(new_pos[x][0], new_pos[x][1], new_pos[x][2]) )	
-	fdata2.close()
-	#>>>>>>>>>-------- Ending a POSCAR File for new swapping -----------")
-	
-	shutil.rmtree('POS_'+str(i).zfill(3), ignore_errors=True) #overwrite a directory
-	os.mkdir( 'POS_'+str(i).zfill(3) )
-	
-	subprocess.call(['cp','-r','POSCAR_'+str(i).zfill(3),'POS_'+str(i).zfill(3)], shell = False)
-	subprocess.call(['cp','-r','INCAR','POS_'+str(i).zfill(3)], shell = False)
-	subprocess.call(['cp','-r','POTCAR','POS_'+str(i).zfill(3)], shell = False)
-	subprocess.call(['cp','-r','KPOINTS','POS_'+str(i).zfill(3)], shell = False)
-	subprocess.call(['cp','-r','job.sh','POS_'+str(i).zfill(3)], shell = False)
-	subprocess.call(['cp','-r','OUTCAR','POS_'+str(i).zfill(3)], shell = False)
-	
-	os.chdir('POS_'+str(i).zfill(3))
-	shutil.copyfile('POSCAR_'+str(i).zfill(3), 'POSCAR' )
-	
-	#subprocess.call(['sbatch','job.sh'], shell = False)	
-	#time.sleep(50)
-
-	# Calculate the new energy of the swap atoms
-	new_energy = calculate_energy();
-	print("Current system Energy: {:10.6f}".format(new_energy), end = '\t')
-	
-	new_pos, tot_energy, naccept, nreject = metropolis_MC(new_energy, old_energy, old_pos, new_pos, naccept, nreject)
-	#old_energy = tot_energy
-	#pos = new_pos
-
-	os.chdir('../')
-	
-	with open('profile.dat', 'a') as fdata3:
-		fdata3.write (" {:2d} {:15.8f} {:20.25s} {:12.8f} {:12.8f}\n".format(i, new_energy, 'POSCAR_'+str(i).zfill(3), naccept/sample, nreject/sample ))
-
-
-	
+		os.chdir('POS_'+str(i).zfill(3))
+		SRO=1.0
+		new_energy = calculate_energy(); # Calculate new energy of the swap atoms
+		#print('{:3d} Energy in POS_{:3s}: {:15.6f} {:13.6f}'.format(i, str(i).zfill(3), new_energy, SRO), end = '\t')
+		a_energy, r_energy, naccept, nreject, yes = metropolis_MC(new_energy, old_energy, naccept, nreject)
+		#print (old_energy, new_energy)
+		
+		os.chdir('../')
+		
+		write_result(i,new_energy,old_energy,SRO,naccept,nreject,sample,yes)
+		old_energy = new_energy
+		
+	#print('Accepted:: {:3d}, Rejected:: {:3d}'.format(naccept, nreject), end = '\n')
+	with open('profile.csv', 'a') as fdata3:
+		fdata3.write ('Accepted:: {:3d}, Rejected:: {:3d}\n'.format(naccept, nreject) )
+		
 	
