@@ -25,45 +25,44 @@ for f in out_files:
 		os.remove(f) #this deletes the file
 				
 def read_poscar():
-	pos = []; kk = []; lattice = []; sum = 0
-	file = open('CONTCAR','r')
-	firstline  = file.readline() # IGNORE first line comment
-	alat = float( file.readline() )# scale
-	Latvec1 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
-	Latvec2 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
-	Latvec3 = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec3[0]),float(Latvec3[1]),float(Latvec3[2]))) 
-	elementtype= file.readline(); #print ("{}".format(elementtype.split() ))
-	atomtypes  = file.readline(); #print ("{}".format(atomtypes.split() ))
-	Coordtype  = file.readline().split()
-	nat = atomtypes.split()
-	nat = [int(i) for i in nat]
-	for i in nat: sum = sum + i
-	n_atoms = sum
-	# print ("Number of atoms:", (n_atoms), end = '\n')	
-	# Reading the Atomic positions				
-	for x in range(int(n_atoms)):
-		coord = file.readline().split()
-		coord = [float(i) for i in coord]
-		pos = pos + [coord]
-	pos = np.array(pos)
-	file.close()
+	pos = []
+	kk = []
+	lattice = []
+	sum = 0
+	with open('CONTCAR','r') as file:
+		firstline  = file.readline() # IGNORE first line comment
+		alat = float( file.readline() )# scale
+		Latvec1 = file.readline().split()
+		Latvec2 = file.readline().split()
+		Latvec3 = file.readline().split()
+		elementtype= file.readline()
+		atomtypes  = file.readline()
+		Coordtype  = file.readline().split()
+		nat = atomtypes.split()
+		nat = [int(i) for i in nat]
+		for i in nat: sum = sum + i
+		n_atoms = sum
+			# print ("Number of atoms:", (n_atoms), end = '\n')	
+			# Reading the Atomic positions				
+		for _ in range(int(n_atoms)):
+			coord = file.readline().split()
+			coord = [float(i) for i in coord]
+			pos = pos + [coord]
+		pos = np.array(pos)
 	return n_atoms,pos,firstline,alat,Latvec1,Latvec2,Latvec3,elementtype,atomtypes,Coordtype
 
 def calculate_energy():
-	#old_energy = os.popen(" grep 'free  energy   TOTEN  =' OUTCAR | tail -1 | awk '{print $5 }' " ).read()
-	#old_energy = float ( old_energy )
-	f = open('OUTCAR',"r")
-	lines = f.readlines()
-	f.close()
+	with open('OUTCAR',"r") as f:
+		lines = f.readlines()
 	for i in lines:
 		word = i.split()
 		if "free  energy   TOTEN  =" in i:
 			ii=lines.index(i)
-	old_energy =  float(lines[ii].split()[4])
-	return old_energy
+	return float(lines[ii].split()[4])
 
 def metropolis_MC(new_energy, old_energy, naccept, nreject):	
-	a_energy = []; r_energy = []
+	a_energy = []
+	r_energy = []
 	accept = False;
 	# Accept if the energy goes down
 	if (new_energy <= old_energy):
@@ -73,10 +72,7 @@ def metropolis_MC(new_energy, old_energy, naccept, nreject):
 		# exp( -(E_new - E_old) / kT ) >= rand(0,1)
 		x = np.exp( -(new_energy - old_energy) / (k*T) )
 		#print (x)
-		if (x >= random.uniform(0.0,1.0)):
-			accept = True
-		else:
-			accept = False
+		accept = x >= random.uniform(0.0,1.0)
 	if accept:
 		# Accept the move
 		naccept += 1; 
@@ -93,41 +89,60 @@ def metropolis_MC(new_energy, old_energy, naccept, nreject):
 
 def write_result(i,new_energy,old_energy,SRO,naccept,nreject,sample,yes):
 	with open('profile.csv', 'a') as fdata3:
-		fdata3.write ("{:3d}, {:9.10s}, {:11.8f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n" \
-		.format(i, 'POS_'+str(i).zfill(3), new_energy, SRO, (naccept/sample)*100, (nreject/sample)*100, yes ) )
-	
+		fdata3.write(
+			"{:3d}, {:9.10s}, {:11.8f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n".format(
+				i,
+				f'POS_{str(i).zfill(3)}',
+				new_energy,
+				SRO,
+				(naccept / sample) * 100,
+				(nreject / sample) * 100,
+				yes,
+			)
+		)
+
+
 	if (yes=='Accept'):
 		with open('accept.dat', 'a') as fdata4:
-			fdata4.write ("{:9.10s}, {:11.6f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n" \
-			.format('POS_'+str(i).zfill(3), new_energy, SRO, (naccept/sample)*100, (nreject/sample)*100, yes ) )
+			fdata4.write(
+				"{:9.10s}, {:11.6f}, {:8.5f}, {:8.3f}, {:8.3f}, {:s}\n".format(
+					f'POS_{str(i).zfill(3)}',
+					new_energy,
+					SRO,
+					(naccept / sample) * 100,
+					(nreject / sample) * 100,
+					yes,
+				)
+			)
 			
 #=====================  MAIN PROGRAM
 if __name__ == "__main__":
 	# FIRST OBTAIN THE GROUND/OPTIMIZED ENERGY OF 
 	# THE CURRENT SQS IN AN IDEAL POSITION
-	naccept = 0; nreject = 0; 
+	naccept = 0
+	nreject = 0;
 	old_energy = calculate_energy();
 	n_atoms, pos, firstline, alat, Latvec1,Latvec2,Latvec3, elementtype, atomtypes, Coordtype = read_poscar();
 	print("Starting simulation energy: {:15.8f}".format(old_energy), end = '\n')
 	print("T={:4f} K Sample={:5d} Atoms={:5d}\n".format(T, sample, n_atoms))
-	
+
 	with open('profile.csv', 'a') as fdata3:
 		fdata3.write ("{:17s}, {:17s}, {:11.12s}, {:6.6s}, {:6s}, {:8s}\n".format(" ", " ","Ediff", "SRO", "Accept[%]", "Reject[%]" ))
-		
+
+	SRO=1.0
 	for i in range(1, sample):
-	
-		os.chdir('POS_'+str(i).zfill(3))
-		SRO=1.0
-		new_energy = calculate_energy(); # Calculate new energy of the swap atoms
+
+		os.chdir(f'POS_{str(i).zfill(3)}')
+		new_energy = calculate_energy()
 		#print('{:3d} Energy in POS_{:3s}: {:15.6f} {:13.6f}'.format(i, str(i).zfill(3), new_energy, SRO), end = '\t')
 		a_energy, r_energy, naccept, nreject, yes = metropolis_MC(new_energy, old_energy, naccept, nreject)
 		#print (old_energy, new_energy)
-		
+
 		os.chdir('../')
-		
+
 		write_result(i,new_energy,old_energy,SRO,naccept,nreject,sample,yes)
 		old_energy = new_energy
-		
+
 	#print('Accepted:: {:3d}, Rejected:: {:3d}'.format(naccept, nreject), end = '\n')
 	with open('profile.csv', 'a') as fdata3:
 		fdata3.write ('Accepted:: {:3d}, Rejected:: {:3d}\n'.format(naccept, nreject) )

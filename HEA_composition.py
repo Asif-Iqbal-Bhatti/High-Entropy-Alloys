@@ -15,7 +15,7 @@ subscript = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 from sympy import *
 import sympy as sp
 sp.init_printing()
-	
+
 '''
 #Composition is given by this relation.
 #    (ABCD)_(1-x)/4 . A_(x), where x=[0, 1]
@@ -44,16 +44,16 @@ for x in np.arange(0, 1.1, 0.1):
 
 	X = round ( (1-x)/4, 3 )
 	Y = round ( x, 1 ) 
-	
+
 	EA = HEA_elem[0]+str(X)+HEA_elem[1]+str(X)+HEA_elem[2]+str(X)+\
 	HEA_elem[3]+str(X)+HEA_elem[4]+str(Y)
-	
+
 	c = 4*X + Y	
 	print(("{:30.35s} | Tot= {} |".format( EA.translate(subscript), c)), end=" ")
 	print("Ci: [{:5.1f}%, {:5.1f}%]".format( X*100, Y*100), end=" ")
-	
+
 	JJ = HEA_energy[0]*X + HEA_energy[1]*X + HEA_energy[2]*X + HEA_energy[3]*X + HEA_energy[4]*Y
-	
+
 	print("EForm: {:8.3f}".format( -1267.01046136/125 - JJ/2) )
 print("="*50)
 

@@ -23,11 +23,9 @@ def hea(path_main):
 		struct 	= Vasprun(os.path.join(path_main,'vasprun.xml'), parse_potcar_file = True)
 		out_car	= os.path.abspath(os.path.join(path_main,'OUTCAR'))
 	except: 
-		print('---> File missing or corrupt: {}'.format(path_main))
-		pass
-		
+		print(f'---> File missing or corrupt: {path_main}')
 	output['id'] = str(path_main).rsplit('/', 3)[1]
-	g = struct.get_computed_entry(); 
+	g = struct.get_computed_entry();
 	entry = compat.process_entries([g])[-1]
 	entries = [entry]
 	name = entry.name
@@ -36,16 +34,17 @@ def hea(path_main):
 	output['energy_per_atom'] 						= entry.energy_per_atom
 	output['energy_per_atom_uncorrected'] = entry.uncorrected_energy/output['natoms']
 	output['correction'] 									= output['energy_per_atom'] - output['energy_per_atom_uncorrected']
-	
+
 	line 			= re.findall('[A-Z][^A-Z]*', name.replace('(','').replace(')',''))
 	searchset	= set(re.sub('\d',' ',' '.join(line)).split())
 	temp 			= filter(lambda e: set(re.sub('\d',' ',str(e.composition).replace(' ','')).split())==searchset, entries)
-	
+
 	all_entries 		= mpr.get_entries_in_chemsys(set(searchset)) + list(temp)
 	phase 					= PhaseDiagram(all_entries)
 	print(phase)
-	ehull 					= phase.get_e_above_hull(entry) 
-	output['Ehull'] = round(ehull, 5); print(ehull) # eV/atom
+	ehull 					= phase.get_e_above_hull(entry)
+	output['Ehull'] = round(ehull, 5)
+	print(ehull) # eV/atom
 	return output
 	
 if __name__ == '__main__':
@@ -57,7 +56,7 @@ if __name__ == '__main__':
 		try:
 			out = hea(str(arg_path))
 		except:
-			out = dict({'fail_': 'fail_' + str(p)})
+			out = dict({'fail_': f'fail_{str(p)}'})
 		return out
 	out = Parallel(n_jobs = -1, backend="threads", batch_size='auto')(delayed(runthis)(p) for p in argo_dir)
 	json.dump(out, open(argo_path + '.json','w'), indent = 1, sort_keys=False, ensure_ascii=True)
