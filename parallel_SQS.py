@@ -12,7 +12,9 @@ num_cores = 40
 print(num_cores)
 
 def run_mcsqs(k):
-	subprocess.Popen(exe + ' -rc -ip ='+ str(k), stdout=subprocess.PIPE, shell=True).communicate()
+	subprocess.Popen(
+		f'{exe} -rc -ip ={str(k)}', stdout=subprocess.PIPE, shell=True
+	).communicate()
 	#subprocess.run(exe + ' -rc -ip ='+ str(k), check=True, capture_output=True, shell=True)
 
 if __name__ == "__main__":

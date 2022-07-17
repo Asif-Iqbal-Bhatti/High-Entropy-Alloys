@@ -15,7 +15,9 @@ z = 14 # Nearest neighbor 1st=4N, 2nd=3N, N is the number of lattice points
 ci = [1/5,1/5,1/5,1/5,1/5] # concentration of each element in a alloy
 
 # Dictionary is defined for pairing probabilities. These values are taken from SRO.
-e1 = 0 ; e2 = 0 ; dd = []
+e1 = 0
+e2 = 0
+dd = []
 os.remove("sro_tmp.dat")
 dict = {'Nb-Ta':0.05,
 				'Nb-Ti':0.0002,
@@ -35,10 +37,9 @@ dict = {'Nb-Ta':0.05,
 ##################################################################################				
 
 sro_tmp = os.popen("sqsgenerator alpha sqs POSCAR --weight=1,0.5 --verbosity=3 " ).read()
-output = open("sro_tmp.dat", 'w')
-for line in sro_tmp:
-	output.write(line)
-output.close()
+with open("sro_tmp.dat", 'w') as output:
+	for line in sro_tmp:
+		output.write(line)
 with open("sro_tmp.dat") as fp:
 	line = fp.readline()
 	cnt = 1
@@ -49,8 +50,8 @@ with open("sro_tmp.dat") as fp:
 		line = fp.readline()
 ##################################################################################
 
-for i in range (len(ci)):
-	e1 = e1 + ( ci[i]*np.log(ci[i]) - ci[i] )
+for item in ci:
+	e1 = e1 + (item * np.log(item) - item)
 l1 = (z-1) * e1	
 
 #for x in dict:
@@ -61,9 +62,9 @@ for i in range(cnt-2):
 	e2 = e2 + ( float(dd[i+1][1]) * np.log(float(dd[i+1][1])) - float(dd[i+1][1]) )
 	#print (dd[i+1][0], float(dd[i+1][1]))
 l2 = z/2 * e2	
-	
+
 # Final entropy of the system :
-for x in dict:
-	print ("{:6s} {:9.5f}".format( x, dict[x] ), end='\r' )
+for x, value in dict.items():
+	print("{:6s} {:9.5f}".format(x, value), end='\r')
 print (  "T*S = {:12.5f} meV at T=300K".format( (l1 - l2 + ( z/2 - 1 ))*k*1000*T    ))
 

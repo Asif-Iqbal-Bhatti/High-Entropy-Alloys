@@ -25,12 +25,12 @@ for u in next(os.walk('.'))[1]:
 	initial = read_vasp(hh)
 	pos = initial.get_positions()
 	ucell = initial.get_cell()
-	
+
 	type = initial.get_chemical_symbols()
 	atom_type = sorted(list(set(type)))
 	natm=len(atom_type)
 	print ("Order of atom types:", atom_type)
-	
+
 	top = pc.System()
 	top.read_inputfile(hh,format='poscar')
 	#top.find_neighbors(method='cutoff', cutoff=1.2)

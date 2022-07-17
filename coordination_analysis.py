@@ -24,82 +24,92 @@ from pathlib import Path
 rcutoff = float(sys.argv[1]);
 
 def read_POSCAR():
-	pos = []; P_LV1 = []; P_LV2 = []; P_LV3 = []; sum = 0;
+	pos = []
+	P_LV1 = []
+	P_LV2 = []
+	P_LV3 = []
+	sum = 0;
 	if Path('POSCAR_perfect').is_file():
-		file = open('POSCAR_perfect','r')
-		firstline  = file.readline() # IGNORE first line comment
-		alat       = float( file.readline() )# scale
-		P1    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec1[0]),float(Latvec1[1]),float(Latvec1[2])))
-		P2    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec2[0]),float(Latvec2[1]),float(Latvec2[2])))
-		P3    = file.readline().split(); #print("{:9.6f} {:9.6f} {:9.6f}".format(float(Latvec3[0]),float(Latvec3[1]),float(Latvec3[2]))) 
-		for ai in P1: P_LV1.append(float(ai)); 
-		for bi in P2: P_LV2.append(float(bi));
-		for ci in P3: P_LV3.append(float(ci));
-		elementtype= file.readline(); #print ("{}".format( elementtype ))
-		atomtypes  = file.readline(); #print ("{}".format(atomtypes.split() ))
-		Coordtype  = file.readline().split()
-		nat = [int(i) for i in atomtypes.split()]
-		for i in nat: sum = sum + i; n_atoms = sum			
-		Mp = np.transpose( [P_LV1,P_LV2,P_LV3] )
-		for x in range(int(n_atoms)):	
-			coord = file.readline().split()
-			# SWITCHING IF "DIRECT" COORDINATE IS DETECTED
-			if (Coordtype[0] == "Direct" or Coordtype[0] == "direct"):
-				Xp = float(coord[0]); Yp = float(coord[1]); Zp = float(coord[2])
-				Dp = [Xp, Yp, Zp];
-				Sp = np.dot(Mp, Dp);	
-				pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
-			else:
-				pos = pos + [coord]	
-		file.close() 
-		#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
-		#for j in range( len( elementtype.split() )):
-		#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
-		#for l in dict:
-		#	for k in range( int(dict[l]) ):
-		#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
-		#		print( l, pos[g][:] )
-		#		g +=1
+		with open('POSCAR_perfect','r') as file:
+			firstline  = file.readline() # IGNORE first line comment
+			alat       = float( file.readline() )# scale
+			P1    = file.readline().split()
+			P2    = file.readline().split()
+			P3    = file.readline().split()
+			P_LV1.extend(float(ai) for ai in P1);
+			P_LV2.extend(float(bi) for bi in P2);
+			for ci in P3: P_LV3.append(float(ci));
+			elementtype= file.readline()
+			atomtypes  = file.readline()
+			Coordtype  = file.readline().split()
+			nat = [int(i) for i in atomtypes.split()]
+			for i in nat: sum = sum + i; n_atoms = sum
+			Mp = np.transpose( [P_LV1,P_LV2,P_LV3] )
+			for _ in range(int(n_atoms)):
+				coord = file.readline().split()
+							# SWITCHING IF "DIRECT" COORDINATE IS DETECTED
+				if Coordtype[0] in ["Direct", "direct"]:
+					Xp = float(coord[0]); Yp = float(coord[1]); Zp = float(coord[2])
+					Dp = [Xp, Yp, Zp];
+					Sp = np.dot(Mp, Dp);	
+					pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
+				else:
+					pos = pos + [coord] 
+			#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
+			#for j in range( len( elementtype.split() )):
+			#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
+			#for l in dict:
+			#	for k in range( int(dict[l]) ):
+			#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
+			#		print( l, pos[g][:] )
+			#		g +=1
 	else:
 		print ("File not exist")
 	return n_atoms,pos,firstline,alat,P_LV1,P_LV2,P_LV3,elementtype,atomtypes,Coordtype
 
 # THIS function is redundant
 def read_CONTCAR():
-	C_pos = []; sum = 0; C_LV1 = []; C_LV2 = []; C_LV3 = []
-	inpfile = open('CONTCAR','r')
-	C_comment  = inpfile.readline() # IGNORE first line comment
-	C_alat       = float( inpfile.readline() )# scale
-	C1 = inpfile.readline().split();
-	C2 = inpfile.readline().split();
-	C3 = inpfile.readline().split();
-	for ai in C1: C_LV1.append(float(ai))
-	for bi in C2: C_LV2.append(float(bi))
-	for ci in C3: C_LV3.append(float(ci))
-	C_elemtype   = inpfile.readline()
-	C_atomtypes  = inpfile.readline()
-	C_Coordtype  = inpfile.readline().split()
-	#if (Coordtype[0] == 'Direct' or Coordtype[0] == 'direct'): exit("Convert to Cartesian, first!")	
-	C_nat = [int(i) for i in C_atomtypes.split()]
-	for i in C_nat: sum = sum + i; C_atoms = sum				
-	for x in range(int(C_atoms)):	
-		C_pos.append( [ str(i) for i in inpfile.readline().rstrip(" ").split()[0:3] ] )
-	C_pos = [ [float(C_pos[j][i]) for i in range(3)] for j in range(C_atoms) ]		
-	inpfile.close() 
+	C_pos = []
+	sum = 0
+	C_LV1 = []
+	C_LV2 = []
+	C_LV3 = []
+	with open('CONTCAR','r') as inpfile:
+		C_comment  = inpfile.readline() # IGNORE first line comment
+		C_alat       = float( inpfile.readline() )# scale
+		C1 = inpfile.readline().split();
+		C2 = inpfile.readline().split();
+		C3 = inpfile.readline().split();
+		C_LV1.extend(float(ai) for ai in C1)
+		C_LV2.extend(float(bi) for bi in C2)
+		C_LV3.extend(float(ci) for ci in C3)
+		C_elemtype   = inpfile.readline()
+		C_atomtypes  = inpfile.readline()
+		C_Coordtype  = inpfile.readline().split()
+		#if (Coordtype[0] == 'Direct' or Coordtype[0] == 'direct'): exit("Convert to Cartesian, first!")	
+		C_nat = [int(i) for i in C_atomtypes.split()]
+		for i in C_nat: sum = sum + i; C_atoms = sum
+		C_pos.extend(
+			[str(i) for i in inpfile.readline().rstrip(" ").split()[:3]]
+			for _ in range(int(C_atoms))
+		)
+
+		C_pos = [ [float(C_pos[j][i]) for i in range(3)] for j in range(C_atoms) ]
 	return C_atoms,C_pos,C_comment,C_alat,C_LV1,C_LV2,C_LV3,C_elemtype,C_atomtypes,C_Coordtype
 	
 def coordination_analysis_single_supercell(n_atoms, pos):
 	# First select the atom around which to measure the coordination.
 	# I've used (x-x0)**2 + (y-y0)**2 + (z-z0)**2 < R**2; (r-r0)**2 < R**2
-	cnt = 0; bar_graph = [];	
-	for x in range(0, int(n_atoms), 1):
+	cnt = 0
+	bar_graph = [];
+	for x in range(int(n_atoms)):
 		i = float(pos[x][0]) - float(pos[r0][0]) 
 		j = float(pos[x][1]) - float(pos[r0][1]) 
 		k = float(pos[x][2]) - float(pos[r0][2]) 
 		if ( ( i*i + j*j + k*k ) <= rcutoff**2 ): #FILTER
 			cnt +=1; bar_graph.append( pos[x][3] )	
 			print ( "{:4d} {}".format(x,pos[x][:]) )
-	print ("Coordination # {}".format( cnt ) )
+	print(f"Coordination # {cnt}")
 	element_counts = Counter(bar_graph)
 	return element_counts, bar_graph
 

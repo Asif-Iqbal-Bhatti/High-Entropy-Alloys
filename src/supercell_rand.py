@@ -17,23 +17,24 @@ supercelly = 5
 supercellz = 5
 #----------------------------------------------------------------------------------#
 def HEAs_supercell():
-	cartesian_units=[]; count=0
+	cartesian_units=[]
+	count=0
 	lattice_vector = np.array([[1,0,0],
 														[0,1,0],
 														[0,0,1]])*lattice_parameter
-	
+
 	lattice_bcc = np.array([[0,0,0],
 												[0.5,0.5,0.5]])*lattice_parameter
-						
+
 	lattice_fcc = np.array([[0,0,0],
 												[0.0,0.5,0.5],											
 												[0.5,0.0,0.5],											
-												[0.5,0.5,0.0]])*lattice_parameter										
-	fcc = lattice_fcc; 
+												[0.5,0.5,0.0]])*lattice_parameter
+	fcc = lattice_fcc;
 	if (sys.argv[1]=='fcc'): b = lattice_parameter*np.sqrt(2)/2.0; print("Burgers vector::", b)
-	bcc = lattice_bcc		
+	bcc = lattice_bcc
 	if (sys.argv[1]=='bcc'): b = lattice_parameter*np.sqrt(3)/2.0; print("Burgers vector::", b)
-	
+
 	for i in range(supercellx):										
 		for j in range(supercelly):
 			for k in range(supercellz):
@@ -47,26 +48,28 @@ def HEAs_supercell():
 					for atom in lattice_fcc:
 						cartesian_units.append(cartesian_basis + atom)
 						count+=1			
-	
+
 	with open("POSCAR","w") as POSCAR:
-		POSCAR.write('#{}\n'.format(sys.argv[1]))
+		POSCAR.write(f'#{sys.argv[1]}\n')
 		POSCAR.write('{:6.6f}\n'.format(1.0))
 		POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[0][0]*supercellx,lattice_vector[0][1]*supercellx,lattice_vector[0][2]*supercellx ))
 		POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[1][0]*supercelly,lattice_vector[1][1]*supercelly,lattice_vector[1][2]*supercelly ))
-		POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))		
+		POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))
 		print("{:12.9f} {:12.9f} {:12.9f}".format(lattice_vector[0][0]*supercellx,lattice_vector[0][1]*supercellx,lattice_vector[0][2]*supercellx ))
 		print("{:12.9f} {:12.9f} {:12.9f}".format(lattice_vector[1][0]*supercelly,lattice_vector[1][1]*supercelly,lattice_vector[1][2]*supercelly ))
-		print("{:12.9f} {:12.9f} {:12.9f}".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))	
+		print("{:12.9f} {:12.9f} {:12.9f}".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))
 		POSCAR.write('Ta\n')
-		POSCAR.write('{}\n'.format((count)))
-		
-	#------------------------- In Cartesian UNITS -------------------------#		
-		if (sys.argv[2] == "c" or sys.argv[2] == "C"):
-			POSCAR.write("Cartesian\n")	
-			for i in range(len(cartesian_units) ):
+		POSCAR.write(f'{count}\n')
+	#------------------------- In Cartesian UNITS -------------------------#
+		if sys.argv[2] in ["c", "C"]:
+			POSCAR.write("Cartesian\n")
+			for cartesian_unit in cartesian_units:
 			#print("{:12.9f} {:12.9f} {:12.9f}".format(cartesian_units[i][0], cartesian_units[i][1], cartesian_units[i][2]))
-				POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(cartesian_units[i][0], cartesian_units[i][1], cartesian_units[i][2]))
-	
+				POSCAR.write(
+					"{:12.9f} {:12.9f} {:12.9f}\n".format(
+						cartesian_unit[0], cartesian_unit[1], cartesian_unit[2]
+					)
+				)
 	#------------------------- In fractional/Direct UNITS -------------------------#		
 		u = np.cross(lattice_vector[1]*supercelly, lattice_vector[2]*supercellz)
 		v = np.cross(lattice_vector[0]*supercellx, lattice_vector[2]*supercellz)
@@ -76,41 +79,56 @@ def HEAs_supercell():
 		Vx = np.inner(lattice_vector[0]*supercellx,u)
 		Vy = np.inner(lattice_vector[1]*supercelly,v)
 		Vz = np.inner(lattice_vector[2]*supercellz,w)
-		
-		if (sys.argv[2] == "d" or sys.argv[2] == "D"):
-			POSCAR.write("Direct\n")		
-			for i in range(len(cartesian_units) ):
-				POSCAR.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(cartesian_units[i],u)/Vx, np.dot(cartesian_units[i],v)/Vy, np.dot(cartesian_units[i],w)/Vz ) )		
-	
+
+		if sys.argv[2] in ["d", "D"]:
+			POSCAR.write("Direct\n")
+			for cartesian_unit_ in cartesian_units:
+				POSCAR.write(
+					"{:12.9f} {:12.9f} {:12.9f}\n".format(
+						np.dot(cartesian_unit_, u) / Vx,
+						np.dot(cartesian_unit_, v) / Vy,
+						np.dot(cartesian_unit_, w) / Vz,
+					)
+				)
+						
+
 	#------------------------- Randomly distribute atoms for HEA -------------------------#
 	with open("newPOSCAR","w") as fdata:
-		for i in range(int(1e3)):
-			randomArrx=random.sample(range(0,count),count)
+		for _ in range(int(1e3)):
+			randomArrx = random.sample(range(count), count)
 		if (count%5 == 0): 	
-			fdata.write('#{}\n'.format(sys.argv[1]))
+			fdata.write(f'#{sys.argv[1]}\n')
 			fdata.write('{:6.6f}\n'.format(1.0))
 			fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[0][0]*supercellx,lattice_vector[0][1]*supercellx,lattice_vector[0][2]*supercellx ))
 			fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[1][0]*supercelly,lattice_vector[1][1]*supercelly,lattice_vector[1][2]*supercelly ))
-			fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))		
+			fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(lattice_vector[2][0]*supercellz,lattice_vector[2][1]*supercellz,lattice_vector[2][2]*supercellz ))
 			fdata.write('A B C D E\n')
 			fdata.write('{0} {0} {0} {0} {0}\n'.format((int(count/5))) )
-			
-			#------------------------- In Cartesian UNITS -------------------------#		
-			if (sys.argv[2] == "c" or sys.argv[2] == "C"):
-				fdata.write("Cartesian\n")	
-				print ('# of atoms per element -> {}. File generated in Cartesian coordinates'.format(count/5))					
+
+			#------------------------- In Cartesian UNITS -------------------------#
+			if sys.argv[2] in ["c", "C"]:
+				fdata.write("Cartesian\n")
+				print(
+					f'# of atoms per element -> {count / 5}. File generated in Cartesian coordinates'
+				)
+
 				for i in range(len(cartesian_units) ):
 					#print("{:12.9f} {:12.9f} {:12.9f}".format(cartesian_units[randomArrx[i]][0],cartesian_units[randomArry[i]][1],cartesian_units[randomArrz[i]][2] ) )
 					fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(cartesian_units[randomArrx[i]][0],cartesian_units[randomArrx[i]][1],cartesian_units[randomArrx[i]][2] ) )
-		
+
 			#------------------------- In fractional/reduced UNITS ----------------#
-			if (sys.argv[2] == "d" or sys.argv[2] == "D"):
-				fdata.write("Direct\n")	
-				print ('# of atoms per element -> {}. File generated in Direct coordinates'.format(count/5))									
+			if sys.argv[2] in ["d", "D"]:
+				fdata.write("Direct\n")
+				print(
+					f'# of atoms per element -> {count / 5}. File generated in Direct coordinates'
+				)
+
 				for i in range(len(cartesian_units) ):
 					fdata.write("{:12.9f} {:12.9f} {:12.9f}\n".format(np.dot(cartesian_units[randomArrx[i]],u)/Vx, np.dot(cartesian_units[randomArrx[i]],v)/Vy, np.dot(cartesian_units[randomArrx[i]],w)/Vz ) )
 		else: 
-			print ('{} is not an integer number for equal composition -> HEAs not generated'.format(count/5))		
+			print(
+				f'{count / 5} is not an integer number for equal composition -> HEAs not generated'
+			)		
 	
 def help():
 	print('A simple script to generate FCC or BCC supercell for HEAs.')
