@@ -90,7 +90,7 @@ def HEAs_supercell():
 						np.dot(cartesian_unit_, w) / Vz,
 					)
 				)
-						
+
 
 	#------------------------- Randomly distribute atoms for HEA -------------------------#
 	with open("newPOSCAR","w") as fdata:
