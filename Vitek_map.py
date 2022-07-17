@@ -134,7 +134,7 @@ def Write_to_file(P_atoms,P_LV1,P_LV2,P_LV3,C_LV1,C_LV2,C_LV3):
 				Dc = [Xc, Yc, Zc]
 
 				if P_Coordtype[0] in ["Direct", "direct"]:
-							
+
 					# Conversion to Cartesian coordinates
 					Sp = Mp @ np.transpose(Dp)
 					Sc = Mc @ np.transpose(Dc); 

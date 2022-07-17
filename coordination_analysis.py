@@ -38,7 +38,7 @@ def read_POSCAR():
 			P3    = file.readline().split()
 			P_LV1.extend(float(ai) for ai in P1);
 			P_LV2.extend(float(bi) for bi in P2);
-			for ci in P3: P_LV3.append(float(ci));
+			P_LV3.extend(float(ci) for ci in P3);
 			elementtype= file.readline()
 			atomtypes  = file.readline()
 			Coordtype  = file.readline().split()
@@ -55,14 +55,14 @@ def read_POSCAR():
 					pos.append( [ Sp[0], Sp[1], Sp[2], coord[3] ] )
 				else:
 					pos = pos + [coord] 
-			#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
-			#for j in range( len( elementtype.split() )):
-			#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
-			#for l in dict:
-			#	for k in range( int(dict[l]) ):
-			#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
-			#		print( l, pos[g][:] )
-			#		g +=1
+					#                      !!! TURN THIS ON IF YOU WANT A FILE IN XYZ FORMAT !!!
+					#for j in range( len( elementtype.split() )):
+					#	dict[elementtype.split()[j]] =  atomtypes.split()[j]; 
+					#for l in dict:
+					#	for k in range( int(dict[l]) ):
+					#		#print( elementtype.split()[ math.floor( k/int(atomtypes.split()[0] ) ) ], pos[k][:] )
+					#		print( l, pos[g][:] )
+					#		g +=1
 	else:
 		print ("File not exist")
 	return n_atoms,pos,firstline,alat,P_LV1,P_LV2,P_LV3,elementtype,atomtypes,Coordtype
