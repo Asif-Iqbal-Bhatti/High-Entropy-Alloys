@@ -40,18 +40,19 @@ https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysi
 
 IMP LINKS::
 ___________________________
-1.   https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
-
-2.  https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
-
+1. https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
+2. https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
 3. https://aip.scitation.org/doi/10.1063/5.0014094; 
-
 4. https://pyscal.org/en/latest/
-
 5. http://emmanuel.clouet.free.fr/presentation.html
-
 6. https://github.com/atomistic-machine-learning/schnetpack
-
+7. https://github.com/libAtoms/QUIP
+8. https://github.com/ACEsuit/mace
+9. https://github.com/Liu-group/AutoSolvate
+10. https://github.com/jbuckeridge/cplap
+11. https://github.com/MaterSim/PyXtal_FF
+12. https://github.com/mir-group/nequip
+13. https://github.com/uw-cmg/MAST-ML
 
 
 
