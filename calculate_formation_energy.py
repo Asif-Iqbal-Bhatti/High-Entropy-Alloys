@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 '''
+#============================================================
 # AUTHOR:: ASIF IQBAL BHATTI
 # USAGE:: TO COMPUTE THE FORMATION ENERGY OF STABLE alloys
-# 
+#============================================================
 '''
 
 import os, re
