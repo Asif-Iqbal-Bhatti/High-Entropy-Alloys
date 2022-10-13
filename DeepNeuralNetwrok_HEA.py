@@ -17,6 +17,7 @@ import tensorflow.compat.v1 as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras import Sequential
+from tensorflow.keras import optimizers
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.utils import plot_model
 from tensorflow.keras.callbacks import TensorBoard
@@ -40,6 +41,7 @@ scaler = StandardScaler().fit(X_train)
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
+#========= MODEL
 model = Sequential()
 model.add(Dense(64, activation='tanh', input_shape=(2,)))
 model.add(Dropout(0.2))
@@ -47,9 +49,11 @@ model.add(Dense(48, activation='tanh'))
 model.add(Dense(24, activation='tanh'))
 model.add(Dense(1, activation='tanh'))
 
+opt = optimizers.SGD(lr = 0.0005)
+
 model.compile(
 loss='binary_crossentropy',
-optimizer='sgd',
+optimizer=opt,
 metrics=['mean_squared_error'],)
 
 model.fit(X_train, y_train, epochs=20, batch_size=1, verbose=1, shuffle=False,
