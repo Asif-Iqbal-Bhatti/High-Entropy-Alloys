@@ -5,8 +5,7 @@
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
 
-
-**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!**
+**USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!
 
 Scripts that are included in this package:
 _________________
@@ -38,7 +37,7 @@ https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysi
 8. Finding SRO with pyscal code
 9. Find core energy of of screw dislocation 
 
-IMP LINKS::
+**BIBLIOGRAPHY
 ___________________________
 1. https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
 2. https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
