@@ -4,7 +4,7 @@
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
-#VASP, #ATAT, #MCSQS, #ASE, #Pymatgen, #Python, #DNN, #Keras, #TensorFlow
+
 
 **USE AT YOUR OWN RISK. NOT EVEN IMPLIED WARRANTY, WHATSOEVER!**
 
@@ -35,24 +35,26 @@ the energy can be calulated and GSFE can be plotted against normalized burger ve
 https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html
 
 7. Creation of Screw dislocations
-8. Finding SRO with oyscal code
+8. Finding SRO with pyscal code
 9. Find core energy of of screw dislocation 
 
 IMP LINKS::
 ___________________________
-i.   https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
+1.   https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html; 
 
-ii.  https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
+2.  https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/; 
 
-iii. https://aip.scitation.org/doi/10.1063/5.0014094; 
+3. https://aip.scitation.org/doi/10.1063/5.0014094; 
 
-iv. https://pyscal.org/en/latest/
+4. https://pyscal.org/en/latest/
 
-v. http://emmanuel.clouet.free.fr/presentation.html
+5. http://emmanuel.clouet.free.fr/presentation.html
 
-
+6. https://github.com/atomistic-machine-learning/schnetpack
 
 
 
 
 https://shields.io/
+
+#VASP, #ATAT, #MCSQS, #ASE, #Pymatgen, #Python, #DNN, #Keras, #TensorFlow
