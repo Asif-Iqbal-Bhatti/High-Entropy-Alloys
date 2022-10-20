@@ -1,5 +1,5 @@
 # Scripts to analyse GSFE, Screw dislocation, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys
-ML & DNN work is on progress
+ML & DNN work is in progress also generating ML potential for HEAs (ternary to quinary)
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
