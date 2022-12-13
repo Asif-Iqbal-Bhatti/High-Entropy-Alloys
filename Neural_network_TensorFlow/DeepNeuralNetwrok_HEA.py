@@ -49,14 +49,14 @@ model.add(Dense(48, activation='tanh'))
 model.add(Dense(24, activation='tanh'))
 model.add(Dense(1, activation='tanh'))
 
-opt = optimizers.SGD(lr = 0.0005)
+opt = optimizers.SGD(lr = 0.01)
 
 model.compile(
 loss='binary_crossentropy',
 optimizer=opt,
 metrics=['mean_squared_error'],)
 
-model.fit(X_train, y_train, epochs=20, batch_size=1, verbose=1, shuffle=False,
+model.fit(X_train, y_train, epochs=900, batch_size=100, verbose=1, shuffle=False,
 callbacks=[tensorboard_callback], validation_data=(X_test, y_test))
 
 y_pred = model.predict(X_test)

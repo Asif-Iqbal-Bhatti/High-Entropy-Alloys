@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+'''
 ############################################################################
 # USAGE  :: python3 coordination_analysis.py sys.argv[1] sys.argv[2]
-# Author :: Asif Iqbal
+# Author :: Asif Iqbal -> AIB_EM2R
 # DATED  :: 10/11/2020
 # NB     :: POSCAR can be in Cartesian/Direct coordinates.
 # Remember the counting starts from Zero in Ovito and python.
@@ -11,6 +12,7 @@
 # Two geometries are implemented: Spherical and Cylindrical.
 # This code reads the POSCAR file with atomic types appended to the last line.
 ############################################################################
+'''
 
 import numpy as np
 import os, sys, random, subprocess, shutil, math

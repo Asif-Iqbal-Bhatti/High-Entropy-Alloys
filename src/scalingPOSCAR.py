@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+
+'''
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # AUTHOR :: Asif Iqbal
-# USAGE :: ./python3 sys.argv[0] <alat> <POSCAR/CONTCAR>
+# USAGE :: python3 sys.argv[0] <alat> <POSCAR/CONTCAR>
 # <POSCAR/CONTCAR> could be in Cartesian/Direct coordinates
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'''
 
 import numpy as np
 import os, sys
