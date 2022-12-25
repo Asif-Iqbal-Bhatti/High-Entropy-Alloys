@@ -10,8 +10,7 @@
 #========================================================
 '''
 
-from torch import nn
-from torch import optim
+from torch import nn, optim
 import pandas as pd
 import torch.nn.functional as F 
 import matplotlib.pyplot as plt
@@ -20,8 +19,8 @@ from sklearn.datasets import make_circles
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler  
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import random_split, TensorDataset
 from sklearn.metrics import confusion_matrix, classification_report
-from torch.utils.data import random_split, DataLoader, TensorDataset
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") 
 print("The model will be running on", device, "device") 
@@ -81,29 +80,31 @@ train_dataloader = DataLoader(dataset=train_data, batch_size=train_batch_size, s
 test_dataloader = DataLoader(dataset=test_data, batch_size=1)
 
 input_dim = 1
-hidden_dim = 10
 output_dim = 1
 
 class NeuralNetwork(nn.Module):
-	def __init__(self, input_dim, hidden_dim, output_dim):
+	def __init__(self, input_dim, output_dim):
 			super(NeuralNetwork, self).__init__()
-			self.layer_1 = nn.Linear(input_dim, hidden_dim)
-			self.layer_2 = nn.Linear(hidden_dim, hidden_dim)
-			self.layer_3 = nn.Linear(hidden_dim, output_dim)
+			self.layer_1 = nn.Linear(input_dim, 64)
+			self.layer_2 = nn.Linear(64, 32)
+			self.layer_3 = nn.Linear(32, output_dim)
+			
 	def forward(self, x):
 			x1 = torch.relu(self.layer_1(x))
 			x2 = torch.relu(self.layer_2(x1))
-			x3 = self.layer_3(x2)
-			return x3
+			x4 = self.layer_3(x2)
+			return x4
 
-model = NeuralNetwork(input_dim, hidden_dim, output_dim)
+model = NeuralNetwork(input_dim, output_dim)
 model.to(device)
 print((model))
 
 #loss_fn = nn.CrossEntropyLoss()
 loss_fn = nn.MSELoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
+optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
 #optimizer = torch.optim.Adam(model.parameters(), lr=0.3)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=4, gamma=0.9)
+#scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=0.5, total_iters=4)
 
 def binary_acc(y_pred, y_test):
 	correct_results_sum = (y_pred).sum().float()
@@ -134,10 +135,9 @@ for epoch in range(num_epochs:=501):
 		running_train_loss += train_loss.item()
 		running_accuracy += acc.item()
 		train_loss_value = running_train_loss/len(train_dataloader)
-		
+	scheduler.step()	
 	if epoch%40 == 0:
-		print(f'Epoch {epoch+0:03}: | train_loss: {train_loss_value:.4f} \
-		| Acc: {running_accuracy/len(train_dataloader):.3f}')
+		print(f'Epoch: {epoch+0:03}, train_loss: {train_loss_value:.4f}, Acc: {running_accuracy/len(train_dataloader):.4f}, lr: {scheduler.get_last_lr()[0]:.4f}')
 print("TRAINING COMPLETE ... ")
 
 step = np.linspace(0, 100, len(loss_values))
@@ -150,7 +150,6 @@ plt.savefig('output.png', dpi=300,bbox_inches='tight')
 
 #========== TEST DATA ON A TRAINED MODEL
 y_pred_list = []
-total, correct = 0, 0
 model.eval()
 with torch.no_grad():
 	for X, y in test_dataloader:
