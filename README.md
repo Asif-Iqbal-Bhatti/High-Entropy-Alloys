@@ -1,4 +1,4 @@
-# Scripts to analyse GSFE, Screw dislocation, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys
+# Scripts to analyse Screw dislocations, GSFE, Frenkel Kontorova, NEB, & SRO for High Entropy Alloys (HEA)
 ML & DNN work is in progress
 ML based potential for HEAs (ternary to quinary) is in progress
 
