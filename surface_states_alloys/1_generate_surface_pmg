@@ -1,41 +1,63 @@
 #!/usr/bin/env python3
 
-#https://blog.kiyohiroyabuuchi.com/en/dft-en/vasp-calculation-of-nudged-elastic-band-neb-2/
+# https://blog.kiyohiroyabuuchi.com/en/dft-en/vasp-calculation-of-nudged-elastic-band-neb-2/
 # https://workshop.materialsproject.org/lessons/03_heterointerfaces/Main%20Lesson/
+# https://pymatgen.org/pymatgen.analysis.adsorption.html
 
 from pymatgen.core.structure import Molecule, Structure
 from pymatgen.io.vasp.outputs import Vasprun, Poscar
 from pymatgen.core.surface import SlabGenerator, Slab
+from pymatgen.analysis.adsorption import AdsorbateSiteFinder, plot_slab
+from pymatgen.transformations.advanced_transformations import AddAdsorbateTransformation, SlabTransformation
+import matplotlib.pyplot as plt
 
 a_fe = 2.833 # PBE
+fig = plt.figure()
+ax = fig.add_subplot()
 
-def surface_transformation():
-    from pymatgen.transformations.advanced_transformations import AddAdsorbateTransformation, SlabTransformation
+def pmg_transformation_surface():
     fe_bcc = Structure.from_file('./1_Fe_bcc/CONTCAR')
-    vr = Vasprun('./1_Fe_bcc/vasprun.xml', parse_potcar_file = True)
-    str = vr.get_computed_entry().structure
+    vpr = Vasprun('./1_Fe_bcc/vasprun.xml', parse_potcar_file = True)
+    str = vpr.get_computed_entry().structure
     
-    slacFe = SlabTransformation((1,1,1), 1, 1, lll_reduce=True, 
-            center_slab=False, in_unit_planes=True, primitive=True, 
-            max_normal_search=2, shift=0, tol=0.1)
-            
+    slabFe = SlabTransformation([1,1,1], 8, 10, lll_reduce=True, 
+                center_slab=False, in_unit_planes=False, primitive=True, 
+                max_normal_search=None, shift=0, tol=0.1)             
+    t = slabFe.apply_transformation(structure=str)
+    t.to(fmt= 'poscar', filename='POSCAR')
+    
     adsorbate = Molecule(['H'], coords=[(0,0,0)])
+    
     ads = AddAdsorbateTransformation(adsorbate, selective_dynamics=True, height=1.0, 
             mi_vec=None, repeat=None, min_lw=5.0, translate=True, 
             reorient=False, find_args=None)
     slab = slabFe.apply_transformation(str)
     slab = ads.apply_transformation(slab, return_ranked_list=False)
+
     
 #============== Method #1
-
-str = Structure.from_file('./1_Fe_bcc/CONTCAR')
-
-slabFe = SlabGenerator(str,
-                        miller_index=(1,1,0),
-                        min_slab_size=9, in_unit_planes = True,
-                        min_vacuum_size=8, primitive  = False,
-                        center_slab=False)
-
-slab = slabFe.get_slabs()
-print(len(slab), slab[0])
-slab[0].to(fmt= 'poscar', filename='POSCAR')
+def pmg_DeLauney_adsorption():
+    str = Structure.from_file('./1_Fe_bcc/CONTCAR')
+    slabFe = SlabGenerator(str,
+                            miller_index=[1,1,1], lll_reduce = True,
+                            min_slab_size=8, in_unit_planes = False,
+                            min_vacuum_size=10, primitive  = True,
+                            center_slab=False,)
+    
+    slab = slabFe.get_slabs()
+    t = AdsorbateSiteFinder(slab=slab[0], height=2.0,selective_dynamics=True, )
+    adsorbate = Molecule(['H'], coords=[(0,0,0)])
+    s = t.add_adsorbate(adsorbate, ads_coord= (0,0,20), repeat=(1,1,1), translate=True)
+    s.to(fmt= 'poscar', filename='POSCAR')
+    
+    #print(t.find_adsorption_sites())
+    #print(t.find_surface_sites_by_height(slab=slab[0]))
+    
+    print(len(slab), slab[0])
+    #slab[0].to(fmt= 'poscar', filename='POSCAR')
+    
+    s = plot_slab(slab[0], ax, repeat=5, scale = 0.9, window=1.0, decay = 0.4)
+    s.figure.savefig('test.png', bbox_inches='tight', dpi=300)
+    #plt.show()
+    
+pmg_transformation_surface()    
