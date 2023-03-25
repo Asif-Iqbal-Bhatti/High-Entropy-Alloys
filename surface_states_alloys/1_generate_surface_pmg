@@ -6,7 +6,9 @@
 
 from pymatgen.core.structure import Molecule, Structure
 from pymatgen.io.vasp.outputs import Vasprun, Poscar
-from pymatgen.core.surface import SlabGenerator, Slab
+from pymatgen.core.surface import SlabGenerator
+from pymatgen.core.surface import get_symmetrically_distinct_miller_indices
+from pymatgen.core.surface import get_symmetrically_equivalent_miller_indices
 from pymatgen.analysis.adsorption import AdsorbateSiteFinder, plot_slab
 from pymatgen.transformations.advanced_transformations import AddAdsorbateTransformation, SlabTransformation
 import matplotlib.pyplot as plt
@@ -24,15 +26,18 @@ def pmg_transformation_surface():
                 center_slab=False, in_unit_planes=False, primitive=True, 
                 max_normal_search=None, shift=0, tol=0.1)             
     t = slabFe.apply_transformation(structure=str)
-    t.to(fmt= 'poscar', filename='POSCAR')
     
-    adsorbate = Molecule(['H'], coords=[(0,0,0)])
+    print(get_symmetrically_distinct_miller_indices(str, 2))
+    print(get_symmetrically_equivalent_miller_indices(str, miller_index=(1,1,1)))
     
-    ads = AddAdsorbateTransformation(adsorbate, selective_dynamics=True, height=1.0, 
-            mi_vec=None, repeat=None, min_lw=5.0, translate=True, 
-            reorient=False, find_args=None)
-    slab = slabFe.apply_transformation(str)
-    slab = ads.apply_transformation(slab, return_ranked_list=False)
+    adsorbate = Molecule(['H'], coords=[(0,0,11)])
+    ads = AddAdsorbateTransformation(adsorbate, 
+            selective_dynamics=True, height=5.0, 
+            mi_vec=None, repeat=[2,2,1],  
+            translate=False, min_lw=0,
+            reorient=True, find_args=None)
+    slabH = ads.apply_transformation(t, return_ranked_list=False)
+    slabH.to(fmt= 'poscar', filename='POSCAR_transf')
 
     
 #============== Method #1
@@ -61,3 +66,4 @@ def pmg_DeLauney_adsorption():
     #plt.show()
     
 pmg_transformation_surface()    
+pmg_DeLauney_adsorption()
