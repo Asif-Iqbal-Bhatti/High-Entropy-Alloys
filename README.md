@@ -1,5 +1,5 @@
-Scripts to analyze Screw dislocations, GSFE, Frenkel Kontorova, NEB, and SRO for High Entropy Alloys (HEA)
-ML and DNN and linear regression scripts
+Selected Python codes to analyze Screw dislocations, GSFE, Frenkel Kontorova, NEB, and SRO for High Entropy Alloys (HEA)
+ML, DNN, and linear regression codes to study HEA
 ML-based potential for HEAs (ternary to quinary) is in progress
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
