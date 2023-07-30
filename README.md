@@ -1,15 +1,13 @@
 # <span style="color: green">Selected Python Codes for High Entropy Alloys Analysis</span>
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
-
-![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)
-
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)  
+![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)  
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)  
 
 ### DISCLAIMER: USE AT YOUR OWN RISK. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
 
 ## Overview
-This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included.
+> This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included.
 
 ### Scripts Included
 Generate Stacking Fault Energy & Screw Dislocation for BCC Crystals:
@@ -42,22 +40,26 @@ Script using the pyscal code to find Short-Range Order in the system.
 Script to determine the core energy of a screw dislocation.
 
 ## Bibliography
-________________________
+________
 The scripts are based on concepts and techniques from the following references:
 
-https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html
-https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/
-https://aip.scitation.org/doi/10.1063/5.0014094
-https://pyscal.org/en/latest/
-http://emmanuel.clouet.free.fr/presentation.html
-https://github.com/atomistic-machine-learning/schnetpack
-https://github.com/libAtoms/QUIP
-https://github.com/ACEsuit/mace
-https://github.com/Liu-group/AutoSolvate
-https://github.com/jbuckeridge/cplap
-https://github.com/MaterSim/PyXtal_FF
-https://github.com/mir-group/nequip
-https://github.com/uw-cmg/MAST-ML
+https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html  
+https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/  
+https://aip.scitation.org/doi/10.1063/5.0014094  
+https://pyscal.org/en/latest/  
+http://emmanuel.clouet.free.fr/presentation.html  
+https://github.com/atomistic-machine-learning/schnetpack  
+https://github.com/libAtoms/QUIP  
+https://github.com/ACEsuit/mace  
+https://github.com/Liu-group/AutoSolvate  
+https://github.com/jbuckeridge/cplap  
+https://github.com/MaterSim/PyXtal_FF  
+https://github.com/mir-group/nequip  
+https://github.com/uw-cmg/MAST-ML  
+http://ann.atomistic.net/links/  
+https://openkim.org/  
+https://github.com/materialsvirtuallab/matgl  
+
 
 ## Notes
 
