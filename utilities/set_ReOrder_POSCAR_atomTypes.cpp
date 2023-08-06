@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     std::unordered_map<std::string, int> elementN;
     std::vector<std::string> element;
     std::unordered_map<std::pair<std::string, int>, std::string, PairHash> line;
-	
+    
 
     std::string lineStr;
     int lineCounter = 0;
@@ -55,9 +55,9 @@ int main(int argc, char* argv[]) {
 
         if (lineCounter <= 5) {
             std::cout << lineStr << '\n';
-			outputFile << lineStr << '\n';
+            outputFile << lineStr << '\n';
         } 
-		else if (lineCounter == 6) {
+        else if (lineCounter == 6) {
             std::istringstream iss(lineStr);
             std::string token;
             while (iss >> token) {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
             }
             Ntypes = element.size();
         } 
-		else if (lineCounter == 7) {
+        else if (lineCounter == 7) {
             std::istringstream iss(lineStr);
             for (int i = 0; i < Ntypes; ++i) {
                 int count;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
                 elementN[element[i]] = count;
             }
         } 
-		else if (toLowerCase(lineStr).find("direct") != std::string::npos) {
+        else if (toLowerCase(lineStr).find("direct") != std::string::npos) {
             for (int i = 0; i < Ntypes; ++i) {
                 const std::string& atom = element[i];
                 for (int j = 0; j < elementN[atom]; ++j) {
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
         std::cout << elementN[argv[i]] << ' ';
     }
     std::cout << '\n';
-	
+    
     std::cout << "Direct\n";
     for (int i = 2; i < argc; ++i) {
         const std::string& atom = argv[i];
@@ -119,7 +119,7 @@ int main(int argc, char* argv[]) {
         outputFile << elementN[argv[j]] << ' ';
     }
     outputFile << '\n';
-	
+    
     outputFile << "Direct\n";
     for (int i = 2; i < argc; ++i) {
         const std::string& atom = argv[i];
@@ -129,6 +129,6 @@ int main(int argc, char* argv[]) {
     }
 
     outputFile.close();
-	std::cerr << "File has been written to reorder_POSCAR\n";
+    std::cerr << "File has been written to reorder_POSCAR\n";
     return 0;
 }
