@@ -1,0 +1,1 @@
+POSCAR: reorder atom types
