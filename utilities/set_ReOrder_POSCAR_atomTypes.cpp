@@ -4,6 +4,13 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <algorithm> // For std::transform
+
+//================================================================
+// AUTHOR :: Asif Iqbal
+// USAGE  :: TO reorder POSCAR ATomic positions based on atom types
+//           ./argv[0] POSCAR Li Cl P S ... NTypesAtom
+//================================================================
 
 struct PairHash {
     template <typename T1, typename T2>
@@ -13,6 +20,15 @@ struct PairHash {
         return h1 ^ h2;
     }
 };
+
+// Helper function to convert a string to lowercase
+std::string toLowerCase(const std::string& str) {
+    std::string lowerStr = str;
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
+}
+
+std::ofstream outputFile("reorder_POSCAR");
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
@@ -39,21 +55,25 @@ int main(int argc, char* argv[]) {
 
         if (lineCounter <= 5) {
             std::cout << lineStr << '\n';
-        } else if (lineCounter == 6) {
+			outputFile << lineStr << '\n';
+        } 
+		else if (lineCounter == 6) {
             std::istringstream iss(lineStr);
             std::string token;
             while (iss >> token) {
                 element.push_back(token);
             }
             Ntypes = element.size();
-        } else if (lineCounter == 7) {
+        } 
+		else if (lineCounter == 7) {
             std::istringstream iss(lineStr);
             for (int i = 0; i < Ntypes; ++i) {
                 int count;
                 iss >> count;
                 elementN[element[i]] = count;
             }
-        } else if (lineStr.find("Direct") != std::string::npos) {
+        } 
+		else if (toLowerCase(lineStr).find("direct") != std::string::npos) {
             for (int i = 0; i < Ntypes; ++i) {
                 const std::string& atom = element[i];
                 for (int j = 0; j < elementN[atom]; ++j) {
@@ -75,7 +95,7 @@ int main(int argc, char* argv[]) {
         std::cout << elementN[argv[i]] << ' ';
     }
     std::cout << '\n';
-
+	
     std::cout << "Direct\n";
     for (int i = 2; i < argc; ++i) {
         const std::string& atom = argv[i];
@@ -84,6 +104,31 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    
+    if (!outputFile) {
+        std::cerr << "Error creating output file: reorder_POSCAR\n";
+        return 1;
+    }
+
+    for (int i = 2; i < argc; ++i) {
+        outputFile << argv[i] << ' ';
+    }
+    outputFile << '\n';
+
+    for (int j = 2; j < argc; ++j) {
+        outputFile << elementN[argv[j]] << ' ';
+    }
+    outputFile << '\n';
+	
+    outputFile << "Direct\n";
+    for (int i = 2; i < argc; ++i) {
+        const std::string& atom = argv[i];
+        for (int j = 1; j <= elementN[atom]; ++j) {
+            outputFile << line[{atom, j}] << '\n';
+        }
+    }
+
+    outputFile.close();
+	std::cerr << "File has been written to reorder_POSCAR\n";
     return 0;
 }
-
