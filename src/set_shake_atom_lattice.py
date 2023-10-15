@@ -2,10 +2,10 @@
 
 '''
 #***************************************************************************************
-# File: [File Name]
+# File: sys.argv[0]
 # Author: Asifem2r/AIB_EM
 # Date: 2023-10-13
-# Description: TO shake/rattle atom positions and nudge lattice vectors
+# Description: To shake or rattle atom positions and nudge lattice vectors
 # 
 # Copyright (c) 2023 Asif Iqbal
 # 
