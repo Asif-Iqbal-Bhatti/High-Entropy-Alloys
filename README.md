@@ -7,7 +7,7 @@
 ### DISCLAIMER: USE AT YOUR OWN RISK. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
 
 ## Overview
-> This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included.
+> This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics, including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included.
 
 ### Scripts Included
 Generate Stacking Fault Energy & Screw Dislocation for BCC Crystals:
@@ -60,6 +60,7 @@ http://ann.atomistic.net/links/
 https://openkim.org/  
 https://github.com/materialsvirtuallab/matgl  
 https://www.doitpoms.ac.uk/tlplib/dislocations/index.php
+https://github.com/gcmt-group/sod
 
 ## Notes
 
