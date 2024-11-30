@@ -4,7 +4,9 @@
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)  
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)  
 
-### DISCLAIMER: USE AT YOUR OWN RISK. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
+### DISCLAIMER: Please be sure to use it at your risk. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
+
+## Scripts used in this paper are uploaded to this repository https://doi.org/10.1016/j.commatsci.2024.113196
 
 ## Overview
 _> This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics, including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included._
@@ -15,7 +17,7 @@ This script calculates the GSFE and screw dislocation for bcc crystals using the
 > '''
 GSFE = (E_fault - E_perfect) / Area
 > '''
-To generate the crystal structures, Atomsk needs to be installed. The link to Atomsk is provided (https://github.com/pierrehirel/atomsk/). The generated POSCAR files can be independently run with VASP after relaxation in the z-direction to calculate the energy. GSFE can be plotted against a normalized burger vector.
+Atomsk needs to be installed to generate the crystal structures. The link to Atomsk is provided (https://github.com/pierrehirel/atomsk/). The generated POSCAR files can be independently run with VASP after relaxation in the z-direction to calculate the energy. GSFE can be plotted against a normalized burger vector.
 
 ### Local Lattice Distortion in HEA Alloys:
 > This script analyzes atomic mismatches for high-entropy alloys. It reads the VASP POSCAR and CONTCAR files for initial and final coordinates, computes the atomic drift from its initial position, and calculates the atomic mismatch. The definitions used in the script are based on a referenced paper, although various definitions exist.
@@ -67,7 +69,7 @@ https://github.com/gcmt-group/sod
 
 ## Notes
 
-_This repository is provided "as is," and there are no guarantees or warranties associated with the code.
+_This repository is provided "as is," and no guarantees or warranties are associated with the code.
 Users are advised to exercise caution and thoroughly review the scripts before using them.
 The repository is actively maintained, and updates may be available to enhance or improve the scripts._
 
