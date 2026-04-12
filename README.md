@@ -44,6 +44,9 @@ This script converts files generated from the MCSQS ATAT code to VASP POSCAR for
 ### Finding the Core Energy of Screw Dislocation:
 > Script to determine the core energy of a screw dislocation.
 
+### Monte Carlo simulation using Foundation Model such as NEQUIP/MACE/Grace ...
+> to find the accepted move w.r.t the atomic positions
+
 ## Bibliography
 ________
 The scripts are based on concepts and techniques from the following references:
