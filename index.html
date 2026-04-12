@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>High Entropy Alloys | Python Analysis Repository</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #081f2d;
+      --surface: #112a3e;
+      --surface-soft: #16344b;
+      --accent: #4fc3f7;
+      --accent-strong: #46b0e2;
+      --text: #e5f5ff;
+      --muted: #a9c5d9;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 18px 60px rgba(0,0,0,0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, rgba(79,195,247,0.18), transparent 35%),
+                  linear-gradient(180deg, #07131f 0%, #0f273a 60%, #07141f 100%);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    header {
+      padding: 4rem 1.5rem 2rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2.8rem, 4vw, 4rem);
+      letter-spacing: -0.05em;
+    }
+
+    header p {
+      max-width: 760px;
+      margin: 1rem auto 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin: 1.5rem auto 0;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding-bottom: 4rem;
+    }
+
+    .panel {
+      background: rgba(14, 30, 45, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-top: 2rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      color: #fff;
+    }
+
+    .panel p,
+    .panel li,
+    .panel dd {
+      color: var(--muted);
+    }
+
+    .panel ul {
+      padding-left: 1.15rem;
+      margin: 0.75rem 0 0 0;
+    }
+
+    .panel li {
+      margin-bottom: 0.65rem;
+    }
+
+    .code-block {
+      display: inline-block;
+      background: rgba(255,255,255,0.06);
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d0efff;
+      font-family: 'Fira Code', Menlo, monospace;
+      margin: 0.75rem 0;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    a.link {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a.link:hover {
+      text-decoration: underline;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 0;
+    }
+
+    .tag {
+      background: rgba(79,195,247,0.12);
+      color: #b1e5ff;
+      padding: 0.55rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-top: 3rem;
+    }
+
+    @media (max-width: 720px) {
+      .panel {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>High Entropy Alloys Analysis Repository</h1>
+    <p>A modern overview of Python-based workflows for HEA property analysis, structure generation, dislocation modeling, short-range order, and machine-learning research.</p>
+    <div class="badge-row">
+      <img src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" alt="Maintenance badge" />
+      <img src="https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic" alt="Python versions badge" />
+      <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GPLv3 license badge" />
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2>Repository Overview</h2>
+      <p>This project contains a curated collection of Python scripts for analyzing properties of High Entropy Alloys (HEAs). The toolkit spans defect modeling, generalized stacking fault energy, dislocation analysis, short-range order, and machine learning workflows for HEA predictions.</p>
+      <p>It also includes experimental support for ML-based interatomic potentials spanning ternary to quinary alloy compositions.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Key Script Categories</h2>
+      <div class="grid">
+        <article>
+          <h3>Dislocation & Defect Analysis</h3>
+          <ul>
+            <li>GSFE and screw dislocation modeling for BCC crystals</li>
+            <li>Dislocation core energy computation</li>
+            <li>Dislocation creation and analysis with Atomman tools</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Structure Generation</h3>
+          <ul>
+            <li>SQS/random structure generation for BCC / FCC / HCP lattices</li>
+            <li>POSCAR conversion for MCSQS / ATAT outputs</li>
+            <li>Local lattice distortion and atomic mismatch analysis</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Monte Carlo & Statistical Modeling</h3>
+          <ul>
+            <li>Monte Carlo simulations for energy-driven structure generation</li>
+            <li>Short-range order evaluation using pyscal</li>
+            <li>Phase diagram and configuration entropy calculations</li>
+          </ul>
+        </article>
+        <article>
+          <h3>Machine Learning & Regression</h3>
+          <ul>
+            <li>Deep Neural Networks with TensorFlow / Keras</li>
+            <li>Linear regression and ML analysis for HEA data</li>
+            <li>ML-based potential workflows and data preparation</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Featured Workflows</h2>
+      <ul>
+        <li>Generate stacking fault energy and screw dislocation data using BCC crystal structures.</li>
+        <li>Analyze atomic drift and mismatch from VASP POSCAR / CONTCAR coordinates.</li>
+        <li>Convert MCSQS / ATAT outputs into VASP POSCAR format.</li>
+        <li>Compute short-range order metrics and identify ordering tendencies in alloy systems.</li>
+        <li>Construct and evaluate machine learning models for HEA property prediction.</li>
+      </ul>
+      <p class="code-block">GSFE = (E_fault - E_perfect) / Area</p>
+    </section>
+
+    <section class="panel">
+      <h2>Bibliography & References</h2>
+      <p>Primary resources, toolkits, and related projects referenced by this repository:</p>
+      <ul>
+        <li><a class="link" href="https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html" target="_blank">ICET SQS generation</a></li>
+        <li><a class="link" href="https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/" target="_blank">ATAT Monte Carlo / SQS</a></li>
+        <li><a class="link" href="https://aip.scitation.org/doi/10.1063/5.0014094" target="_blank">High entropy alloy literature</a></li>
+        <li><a class="link" href="https://pyscal.org/en/latest/" target="_blank">pyscal</a></li>
+        <li><a class="link" href="https://github.com/atomistic-machine-learning/schnetpack" target="_blank">Schnetpack</a></li>
+        <li><a class="link" href="https://github.com/libAtoms/QUIP" target="_blank">QUIP</a></li>
+        <li><a class="link" href="https://github.com/ACEsuit/mace" target="_blank">MACE</a></li>
+        <li><a class="link" href="https://openkim.org/" target="_blank">OpenKIM</a></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Notes</h2>
+      <p>This repository is provided as-is and is intended for research, analysis, and educational use. There are no implied warranties, and users should review scripts carefully before applying them to production work.</p>
+      <p>Contributions are welcome, and the repository may receive updates to improve usability and add new HEA analysis tools.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Tags</h2>
+      <div class="tags">
+        <span class="tag">VASP</span>
+        <span class="tag">ATAT</span>
+        <span class="tag">MCSQS</span>
+        <span class="tag">ASE</span>
+        <span class="tag">Pymatgen</span>
+        <span class="tag">Python</span>
+        <span class="tag">DNN</span>
+        <span class="tag">Keras</span>
+        <span class="tag">TensorFlow</span>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Generated for the High Entropy Alloys repository. View the code and use this page as a quick reference for repository contents.</p>
+  </footer>
+</body>
+</html>

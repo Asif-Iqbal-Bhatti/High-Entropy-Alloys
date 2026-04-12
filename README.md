@@ -4,6 +4,8 @@
 ![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)  
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)  
 
+> View the modern project webpage: [index.html](./index.html)
+
 ### DISCLAIMER: Please be sure to use it at your risk. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
 
 ## Scripts used in this paper are uploaded to this repository https://doi.org/10.1016/j.commatsci.2024.113196
