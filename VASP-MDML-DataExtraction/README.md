@@ -114,5 +114,3 @@ pip install ase numpy scipy scikit-learn umap-learn joblib matplotlib pandas plo
 
 
 ---
-
-If you want, I can commit this README update to the repo now (I will), and then optionally add small usage examples or argument parsing to any script you pick first.
