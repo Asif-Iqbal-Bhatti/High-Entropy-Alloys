@@ -1,85 +1,154 @@
-# <span style="color: green">Selected Python Codes for High Entropy Alloys Analysis</span>
+# High-Entropy-Alloys — Computational Toolkit
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)  
-![versions](https://img.shields.io/pypi/pyversions/Django?color=green&label=python&style=plastic)  
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)  
+A collection of Python (and some C++/Fortran) scripts for first-principles and machine-learning-based analysis of High-Entropy Alloys (HEAs). The tools cover the full workflow from structure generation and thermodynamics through defect mechanics, machine-learned potentials, and deep-learning property prediction.
 
-> View the modern project webpage: [index.html](./index.html)
+Scripts accompanying the peer-reviewed publication:
+> [doi.org/10.1016/j.commatsci.2024.113196](https://doi.org/10.1016/j.commatsci.2024.113196)
 
-### DISCLAIMER: Please be sure to use it at your risk. THERE IS NO IMPLIED WARRANTY WHATSOEVER!
+---
 
-## Scripts used in this paper are uploaded to this repository https://doi.org/10.1016/j.commatsci.2024.113196
+## Repository layout
 
-## Overview
-_> This GitHub repository contains a collection of Python scripts for analyzing various properties of High Entropy Alloys (HEAs). The scripts cover a range of topics, including screw dislocations, Generalized Stacking Fault Energy (GSFE), Frenkel Kontorova, Nudged Elastic Band (NEB), and Short-Range Order (SRO). Additionally, it includes Machine Learning (ML), Deep Neural Networks (DNN), and linear regression codes to study HEAs. Furthermore, a work-in-progress ML-based potential for HEAs, from ternary to quinary compositions, is also included._
+```
+High-Entropy-Alloys/
+├── src/                              # Core structure and thermodynamics scripts
+├── MLIP_MonteCarlo/                  # Monte Carlo with machine-learned potentials
+├── VASP_MLFF/                        # VASP machine-learned force-field utilities
+├── VASP-MDML-DataExtraction/         # VASP → Extended-XYZ / ML-dataset preparation
+├── MaterialsPropertyAnalysis_ML_DNN/ # ML / deep-learning property prediction
+├── Elastic_tensor_from_Lammps/       # Elastic tensor extraction via LAMMPS
+├── surface_states_alloys/            # Surface energy calculations
+└── utilities/                        # Plotting, formation energy, SRO, dislocations, …
+```
 
-### Scripts Included
-> Generate Stacking Fault Energy & Screw Dislocation for BCC Crystals:
-This script calculates the GSFE and screw dislocation for bcc crystals using the formula:
-> '''
-GSFE = (E_fault - E_perfect) / Area
-> '''
-Atomsk needs to be installed to generate the crystal structures. The link to Atomsk is provided (https://github.com/pierrehirel/atomsk/). The generated POSCAR files can be independently run with VASP after relaxation in the z-direction to calculate the energy. GSFE can be plotted against a normalized burger vector.
+---
 
-### Local Lattice Distortion in HEA Alloys:
-> This script analyzes atomic mismatches for high-entropy alloys. It reads the VASP POSCAR and CONTCAR files for initial and final coordinates, computes the atomic drift from its initial position, and calculates the atomic mismatch. The definitions used in the script are based on a referenced paper, although various definitions exist.
-This script analyzes atomic mismatches for high-entropy alloys. It reads the VASP POSCAR and CONTCAR files for initial and final coordinates, computes the atomic drift from its initial position, and calculates the atomic mismatch. The definitions used in the script are based on a referenced paper, although various definitions exist.
+## Modules
 
-### Generating Random Structure Using the SQS Technique:
-> Python script to generate BCC/FCC/HCP random structures using the modified NANOHUB code.
+### `src/` — Structure generation & core thermodynamics
 
-Code to Convert File Generated from MCSQS ATAT Code to VASP POSCAR File:
-This script converts files generated from the MCSQS ATAT code to VASP POSCAR format.
+| Script | Purpose |
+|--------|---------|
+| `SQS_structure_gen.py` | Generates Special Quasi-random Structures (SQS) for multi-component HEAs |
+| `mcsqs2poscar.py` / `sqs2poscar_modified_AIB.cpp` | Converts MCSQS output to VASP POSCAR format |
+| `get_mcsqs_lattices.py` | Prepares BCC/FCC/HCP lattice inputs for MCSQS |
+| `PMSROCalculatorPyScale2.py` | Computes PM-SRO and WC-SRO short-range order parameters across neighbour shells |
+| `get_ConfigurationEntropy_HEA.py` | Calculates configurational entropy (ΔS_conf = −k_B Σ c_i ln c_i) from CIF files, with temperature sweep and CSV export |
+| `GSFE_BCC.py` / `GSFE.sh` | Generalized Stacking Fault Energy (GSFE) calculations for BCC crystals |
+| `BCCScrew_dislocation.py` / `BCCScrew_dislocation.f90` | Screw dislocation core analysis for BCC lattices |
+| `lattice_mismatch_measure.py` | Quantifies lattice mismatch between alloy components |
+| `scalingPOSCAR.py` / `supercell_rand.py` | POSCAR scaling and random supercell construction |
+| `set_orderTypes_POSCAR.py` / `set_shake_atom_lattice.py` | Atomic ordering and thermal displacement tools |
+| `read_POSCAR.cpp` | Lightweight C++ POSCAR reader |
 
-### Monte Carlo Code:
-> Monte Carlo code for generating structures with lower binding energy
+---
 
-### Dislocation Analysis:
-> Script for analyzing dislocations using tools available at https://www.ctcms.nist.gov/potentials/atomman/tutorial/04.3._Dislocation_analysis_tools.html.
+### `MLIP_MonteCarlo/` — Monte Carlo with machine-learned potentials
 
-### Creation of Screw Dislocations:
-> Script for creating screw dislocations.
+`MLIP_MonteCarlo_HEA.py` — Metropolis Monte Carlo driven by a GRACE machine-learned interatomic potential. Performs random atomic substitutions on a supercell, accepts/rejects moves based on energy at a target temperature, and saves the lowest-energy configuration found.
 
-### Finding Short-Range Order (SRO) with Pyscal Code:
-> Script using the pyscal code to find short-range Orders in the system
+---
 
-### Finding the Core Energy of Screw Dislocation:
-> Script to determine the core energy of a screw dislocation.
+### `VASP_MLFF/` — VASP machine-learned force-field utilities
 
-### Monte Carlo simulation using Foundation Model such as NEQUIP/MACE/Grace ...
-> to find the accepted move w.r.t the atomic positions
+| Script | Purpose |
+|--------|---------|
+| `get_data.py` | Extracts training frames from VASP ML-FF runs |
+| `get_MLData_py4vasp.py` | Reads VASP output via py4vasp for ML dataset construction |
+| `get_VASP_ML_ERR_Analysis.py` | Analyses force/energy errors of the VASP ML-FF against DFT reference |
 
-## Bibliography
-________
-The scripts are based on concepts and techniques from the following references:
+---
 
-https://icet.materialsmodeling.org/advanced_topics/sqs_generation.html  
-https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/  
-https://aip.scitation.org/doi/10.1063/5.0014094  
-https://pyscal.org/en/latest/  
-http://emmanuel.clouet.free.fr/presentation.html  
-https://github.com/atomistic-machine-learning/schnetpack  
-https://github.com/libAtoms/QUIP  
-https://github.com/ACEsuit/mace  
-https://github.com/Liu-group/AutoSolvate  
-https://github.com/jbuckeridge/cplap  
-https://github.com/MaterSim/PyXtal_FF  
-https://github.com/mir-group/nequip  
-https://github.com/uw-cmg/MAST-ML  
-http://ann.atomistic.net/links/  
-https://openkim.org/  
-https://github.com/materialsvirtuallab/matgl  
-https://www.doitpoms.ac.uk/tlplib/dislocations/index.php
-https://github.com/gcmt-group/sod
+### `VASP-MDML-DataExtraction/` — VASP → ML-ready datasets
 
-## Notes
+| Script | Purpose |
+|--------|---------|
+| `vaspouth5_to_extxyz.py` | Converts `vaspout.h5` trajectories to Extended XYZ |
+| `get_MLAIMDVASP_to_EXTXYZ.py` | Extracts AIMD frames from VASP output to Extended XYZ |
+| `1_MPtrj_Dataset_Query_and_Parsing_Criteria.py` | Queries and filters the MPtrj dataset (energy convergence, GGA/GGA+U matching) |
+| `get_PureElementEnergyRef.py` | Retrieves DFT reference energies for pure elements |
+| `generate_PESPlot_from_DFTData.py` / `get_PESPlot_DFTData.py` | Potential energy surface visualisation via UMAP dimensionality reduction |
+| `get_plot_MSD_GPU.py` / `plot_MSD_from_VASPKIT.py` | GPU-accelerated (CuPy) and standard MSD analysis |
+| `get_struct_from_Alexandria.py` | Downloads structures from the Alexandria database |
+| `test_model_from_SevenNet.py` | Evaluates a SevenNet MLIP against DFT data |
 
-_This repository is provided "as is," and no guarantees or warranties are associated with the code.
-Users are advised to exercise caution and thoroughly review the scripts before using them.
-The repository is actively maintained, and updates may be available to enhance or improve the scripts._
+---
 
-## Tags
+### `MaterialsPropertyAnalysis_ML_DNN/` — Machine learning & deep learning
 
-#VASP #ATAT #MCSQS #ASE #Pymatgen #Python #DNN #Keras #TensorFlow
+| Script | Purpose |
+|--------|---------|
+| `ML_DNN_with_TensorFlowKeras/DeepNeuralNetwrok_TF_HEA.py` | Deep neural network (TF/Keras) for HEA property regression |
+| `ML_DNN_with_TensorFlowKeras/LinearRegression_TF_HEA.py` | TensorFlow linear regression baseline |
+| `ML_DNN_with_TensorFlowKeras/get_gaussianProcessRegression.py` | Gaussian process regression for property prediction |
+| `pred_short_range_order_pytorch.py` | PyTorch neural network trained on Materials Project data to predict SRO / alloy properties |
 
-Feel free to use and contribute to this repository. For more information, kindly visit the project's GitHub page.
+---
+
+### `Elastic_tensor_from_Lammps/`
+
+`elastic_tensor_lammps.py` — Automates extraction and symmetrisation of the full elastic stiffness tensor from LAMMPS deformation runs.
+
+---
+
+### `surface_states_alloys/`
+
+| Script | Purpose |
+|--------|---------|
+| `1_generate_surface_pmg.py` | Generates surface slabs using Pymatgen |
+| `get_surface_energy_using_pymatgen.py` | Computes surface energy (J/m²) from VASP CONTCAR/OUTCAR files relative to a bulk reference |
+
+---
+
+### `utilities/` — Supporting tools
+
+| Sub-directory / script | Purpose |
+|------------------------|---------|
+| `HEA_composition.py` | Composition parsing and weight-fraction ↔ atom-fraction conversion |
+| `configuration_entropy.py` | Standalone configurational entropy calculator |
+| `coordination_analysis.py` | Coordination number analysis from trajectory data |
+| `Poscar_colorPlotter.py` | Colour-coded POSCAR structure visualisation |
+| `get_InitialRelax_from_ASE.py` | Initial structure relaxation via ASE |
+| `get_dispersion.py` | Phonon/electronic dispersion utilities |
+| `ClusterExpansion_tools/icet_ClusterExpansion.py` | Cluster expansion with ICET |
+| `ConversionData_tools/` | Unit/format converters (DAT → JSON, wt% → at%) |
+| `DislocationDipole_tools/` | Dislocation dipole elastic energy, Frenkel-Kontorova model, core energy |
+| `FormEnergy_tools/calculate_formation_energy.py` | Formation energy calculation from DFT total energies |
+| `MCSQS_tools/` | Parallel SQS generation, SRO via pyscal, MCSQS file numbering |
+| `MonteCarlo_tools/Metropolis_Monte_carlo.py` | Metropolis Monte Carlo reference implementation |
+| `PhaseDiagram_tools/phase_diagram_for_HEA.py` | HEA phase diagram construction |
+| `plot_tools_HEA/` | Vitek maps, box plots, bar charts, spider plots, 3-D spline fitting, PDOS plotting, Fresnel rendering |
+
+---
+
+## Dependencies
+
+| Category | Packages |
+|----------|----------|
+| Core scientific | `numpy`, `scipy`, `matplotlib`, `pandas` |
+| Atomistic | `ase`, `pymatgen`, `pyscal` |
+| VASP interface | `py4vasp` |
+| Machine learning | `scikit-learn`, `tensorflow` / `keras`, `torch` |
+| MLIPs | `grace` (GRACE potential), `sevenn` (SevenNet) |
+| Dimensionality reduction | `umap-learn`, `plotly` |
+| GPU acceleration | `cupy` (optional, for MSD on CUDA hardware) |
+| Other | `icet` (cluster expansion), `atomsk` (structure generation, external binary) |
+
+Python 3.8+ is required throughout.
+
+---
+
+## Citation
+
+If you use these scripts in your research, please cite:
+
+> Bhatti, A. I. *et al.*, *Computational Materials Science*, 2024.
+> [https://doi.org/10.1016/j.commatsci.2024.113196](https://doi.org/10.1016/j.commatsci.2024.113196)
+
+---
+
+## License
+
+Distributed under the **GNU General Public License v3.0**. See [`LICENCE`](LICENCE) for details.
+
+> **Disclaimer:** Scripts are provided as-is with no warranty. Please review each script carefully before use in a research workflow.
