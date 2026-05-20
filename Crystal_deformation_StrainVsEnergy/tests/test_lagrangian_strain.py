@@ -55,6 +55,47 @@ class TestDeformationCodes:
             assert_matrix_close(eta_re, eta, atol=1e-9,
                                 ), f"Roundtrip failed for code {code}"
 
+    # --- Shear convention (ElaStic/exciting-consistent) ---------------------
+
+    def test_shear_codes_use_doubled_voigt(self):
+        # Positions 3-5 of dc must be '2' so Voigt e = 2η → tensor off-diag = η
+        pure_shear_codes = {4, 5, 6, 7}
+        for code in pure_shear_codes:
+            dc, _ = DEFORMATION_CODES[code]
+            for pos in range(3, 6):
+                ch = dc[pos]
+                assert ch in ('2', '0'), (
+                    f"Code {code}, dc='{dc}': shear position {pos} is '{ch}', "
+                    f"expected '2' or '0' (ElaStic convention)"
+                )
+
+    def test_code6_tensor_shear_equals_eta(self):
+        # dc='000002': e[5]=2η → tensor η₁₂ = e[5]/2 = η (not η/2)
+        dc, _ = DEFORMATION_CODES[6]
+        eta_val = 0.05
+        e   = build_voigt_strains(dc, eta_val)
+        mat = voigt_to_eta_matrix(e)
+        assert mat[0, 1] == pytest.approx(eta_val, rel=1e-10)
+        assert mat[1, 0] == pytest.approx(eta_val, rel=1e-10)
+
+    def test_code4_tensor_shear_equals_eta(self):
+        # dc='000200': e[3]=2η → tensor η₂₃ = e[3]/2 = η
+        dc, _ = DEFORMATION_CODES[4]
+        eta_val = 0.04
+        e   = build_voigt_strains(dc, eta_val)
+        mat = voigt_to_eta_matrix(e)
+        assert mat[1, 2] == pytest.approx(eta_val, rel=1e-10)
+        assert mat[2, 1] == pytest.approx(eta_val, rel=1e-10)
+
+    def test_code5_tensor_shear_equals_eta(self):
+        # dc='000020': e[4]=2η → tensor η₁₃ = e[4]/2 = η
+        dc, _ = DEFORMATION_CODES[5]
+        eta_val = 0.03
+        e   = build_voigt_strains(dc, eta_val)
+        mat = voigt_to_eta_matrix(e)
+        assert mat[0, 2] == pytest.approx(eta_val, rel=1e-10)
+        assert mat[2, 0] == pytest.approx(eta_val, rel=1e-10)
+
 
 # ===========================================================================
 # read_contcar
