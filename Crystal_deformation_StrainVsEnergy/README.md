@@ -205,5 +205,3 @@ can trigger phase transitions and invalidate the quadratic E(η) fit.
 [4] L.D. Landau, E.M. Lifshitz, *Theory of Elasticity*, Elsevier (1986).
     ISBN: 0750626330
 
-[5] IRelast package — Voigt deformation codes for cubic systems:
-    https://doi.org/10.1016/j.jallcom.2017.10.139
