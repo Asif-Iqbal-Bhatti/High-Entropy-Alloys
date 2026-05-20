@@ -29,21 +29,26 @@ init(autoreset=True)
 # Deformation-code catalogue
 # ---------------------------------------------------------------------------
 DEFORMATION_CODES: dict[int, tuple[str, str]] = {
+    # Normal-strain codes: positions 0-2 use 'E'/'e' → Voigt eᵢ = η.
+    # Shear-strain codes:  positions 3-5 use '2'     → Voigt eᵢ = 2η,
+    #                      so the tensor off-diagonal = eᵢ/2 = η.
+    # This matches the ElaStic / exciting convention so that post-processing
+    # extracts Cᵢⱼ directly without an extra factor-of-2 correction.
     0:  ("EEE000", "volume strain"),
     1:  ("E00000", "linear strain along x"),
     2:  ("0E0000", "linear strain along y"),
     3:  ("00E000", "linear strain along z"),
-    4:  ("000E00", "yz shear strain"),
-    5:  ("0000E0", "xz shear strain"),
-    6:  ("00000E", "xy shear strain"),
-    7:  ("000EEE", "shear strain along ⟨111⟩"),
+    4:  ("000200", "yz shear strain   (tensor η₂₃ = η)"),
+    5:  ("000020", "xz shear strain   (tensor η₁₃ = η)"),
+    6:  ("000002", "xy shear strain   (tensor η₁₂ = η)"),
+    7:  ("000222", "shear along ⟨111⟩ (tensor η₂₃=η₁₃=η₁₂=η)"),
     8:  ("EE0000", "xy in-plane strain"),
     9:  ("Ee0000", "xy in-plane shear strain"),
-    10: ("EEEEEE", "global strain"),
-    11: ("E00E00", "mixed strain  (e₁, e₄)"),
-    12: ("E000E0", "mixed strain  (e₁, e₅)"),
-    13: ("E0000E", "mixed strain  (e₁, e₆)"),
-    14: ("EE0E00", "mixed strain  (e₁, e₂, e₄)"),
+    10: ("EEE222", "global strain"),
+    11: ("E00200", "mixed strain  (e₁, 2e₄)"),
+    12: ("E00020", "mixed strain  (e₁, 2e₅)"),
+    13: ("E00002", "mixed strain  (e₁, 2e₆)"),
+    14: ("EE0200", "mixed strain  (e₁, e₂, 2e₄)"),
 }
 
 # ---------------------------------------------------------------------------
