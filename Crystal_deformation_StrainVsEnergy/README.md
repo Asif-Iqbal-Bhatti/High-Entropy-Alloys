@@ -197,7 +197,7 @@ can trigger phase transitions and invalidate the quadratic E(η) fit.
     [http://exciting-code.org/nitrogen-energy-vs-strain-calculations](https://exciting-code.org/)
 
 [2] Materials Project — elasticity calculations:
-    https://wiki.materialsproject.org/Elasticity_calculations
+    [https://wiki.materialsproject.org/Elasticity_calculations](https://pymatgen.org/pymatgen.core.elasticity.html)
 
 [3] ELASTIC code (stress–strain approach):
     https://elastic.readthedocs.io/en/stable/
